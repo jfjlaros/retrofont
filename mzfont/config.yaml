@@ -1,0 +1,14 @@
+font:
+  base: /usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf
+systems:
+  - name: SharpMZtest
+    mirror: true
+    map_offset: 0x0a92
+    sets:
+      - location: 0
+        map: true
+      - location: 0
+      - location: 1
+  - name: MSXtest
+    sets:
+      - location: 0
