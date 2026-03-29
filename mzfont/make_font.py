@@ -1,5 +1,6 @@
 from typing import BinaryIO
 
+from .math import make_matrix, pad
 from .suppress import suppress_output
 
 with suppress_output():
@@ -8,41 +9,81 @@ from fontforge import open as ff_open
 from psMat import scale
 
 
-def _read_glyphs(handle: BinaryIO) -> list[bytes]:
+def _read_cgrom(handle: BinaryIO) -> list[bytes]:
     data = handle.read()
-    return [data[i:i + 8] for i in range(0, len(data), 8)]
+    data += b'\x00' * pad(len(data), 256)
+    return make_matrix(data, (256, 8))
 
 
-def _read_perm(handle: BinaryIO, offset: int) -> list[int]:
+def _read_firmware(handle: BinaryIO, offset: int) -> list[int]:
     handle.seek(offset)
     return list(handle.read(256))
 
 
 class Font:
     def __init__(
-            self, glyphs_handle: BinaryIO, perm_handle: BinaryIO,
-            perm_offset: int, mirror: bool, base_font: str, font_name: str
-            ) -> None:
+            self, cgrom_handle: BinaryIO, base_font: str, font_name: str,
+            firmware_handle: BinaryIO=None, firmware_offset: int=0,
+            mirror: bool=False, default: list=[]) -> None:
         '''8-bit TrueType font generator.
 
-        :arg glyphs_handle: File handle to character ROM file.
-        :arg perm_handle: File handle to monitor ROM file.
+        :arg cgrom_handle: File handle to character ROM file.
         :arg base_font: File name of base font file.
         :arg font_name: Font name.
+        :arg firmware_handle: File handle to firmware ROM file.
+        :arg firmware_offset: Location of the map in the firmware.
+        :arg mirror: Mirror glyphs.
+        :arg default: Generate default font.
         '''
-        self._glyphs = _read_glyphs(glyphs_handle)
-        self._identity = list(range(256))
-        self._perm = _read_perm(perm_handle, perm_offset) \
-            if perm_handle else self._identity
-        self._testbit = self._testbit_little_endian \
-            if mirror else self._testbit_big_endian
+        self._cgrom = _read_cgrom(cgrom_handle)
+
+        self._firmware_map = b''
+        if firmware_handle:
+            self._firmware_map = _read_firmware(
+                firmware_handle, firmware_offset)
+
+        if mirror:
+            self._testbit = self._testbit_little_endian
+        else:
+            self._testbit = self._testbit_big_endian
+
+        self._char_offset = 0xe000
 
         with suppress_output():
             self._font = ff_open(base_font)
+
+        if default:
+            self._config_default_font()
+            self._make_default_charset(default)
+        else:
+            self._config_font()
+
+        self._set_name(font_name)
+        self.make_charsets()
+
+    def _config_font(self) -> None:
         self._glyph_width = self._font['space'].width
         self._glyph_height = self._font.em + self._font.os2_typolinegap
         self._glyph_offset = -self._font.descent
-        self._set_name(font_name)
+
+    def _config_default_font(self) -> None:
+        self._glyph_width = self._font.em
+        self._glyph_height = self._font.em
+        self._glyph_offset = 0
+
+        self._font.ascent = self._font.em
+        self._font.descent = 0
+
+        self._font.os2_typoascent = self._font.ascent
+        self._font.os2_typodescent = -self._font.descent
+        self._font.os2_typolinegap = 0
+
+        self._font.os2_winascent = self._font.ascent
+        self._font.os2_windescent = self._font.descent
+
+        self._font.hhea_ascent = self._font.ascent
+        self._font.hhea_descent = -self._font.descent
+        self._font.hhea_linegap = 0
 
     def _set_name(self, font_name: str) -> None:
         self._font.fontname = font_name
@@ -72,51 +113,57 @@ class Font:
             for x in range(8):
                 if self._testbit(glyph[y], x):
                     self._draw_pixel(pen, x, y)
+        self._char_offset += 1  # Hmmm.
 
-    def make_charset(self, offset: int, charset: int, perm: bool) -> None:
-        print(f'{offset:04x}  {charset} {perm}')
-        glyph_offset = 0x100 * charset
-        permutation = self._perm if perm else self._identity
-        for code in range(0x100):
-            self._make_character(
-                offset + code,
-                self._glyphs[glyph_offset + permutation[code]])
+    def _ident(self, value: int) -> int:
+        return value
 
-    #def _make_charsets(self) -> None:
-    #    # Interchange character set.
-    #    self._make_charset(0xe000, 0, self._perm)
-    #    # Primary display character set.
-    #    self._make_charset(0xe100, 0, self._identity)
-    #    # Alternate display character set.
-    #    self._make_charset(0xe200, 1, self._identity)
+    def _map(self, value: int) -> int:
+        return self._firmware_map[value]
 
-    #def _make_default_charset(self) -> None:
-    #    for code in range(0x20, 0x5e):
-    #        self._make_character(code, self._glyphs[self._perm[code]])
-    #    for code in range(0x61, 0x7b):
-    #        self._make_character(code, self._glyphs[0x20 + code])
-    #    self._make_character(0x5e, self._glyphs[0xbe])
-    #    self._make_character(0x5f, self._glyphs[0x3c])
-    #    self._make_character(0x60, self._glyphs[0xa4])
-    #    self._make_character(0x7b, self._glyphs[0xbc])
-    #    self._make_character(0x7c, self._glyphs[0x35])
-    #    self._make_character(0x7d, self._glyphs[0x40])
-    #    self._make_character(0x7e, self._glyphs[0xa5])
+    def _make_charsets(self, f: callable) -> None:
+        for charset in self._cgrom:
+            for i, _ in enumerate(charset):
+                self._make_character(self._char_offset, charset[f(i)])
+
+    def make_charsets(self) -> None:
+        self._char_offset = 0xe000
+        if self._firmware_map:
+            self._make_charsets(self._map)
+        self._make_charsets(self._ident)
+
+    def _map_default(self, item: dict, f: callable) -> None:
+        charset = self._cgrom[0]
+
+        if 'range' not in item:
+            for src, dest in item['values']:
+                self._make_character(src, charset[f(dest)])
+            return
+
+        offset = item.get('offset', 0)
+        for code in range(*item['range']):
+            self._make_character(code, charset[f(offset + code)])
+
+    def _make_default_charset(self, default: list[dict]) -> None:
+        for item in default:
+            if item['source'] == 'map':
+                self._map_default(item, self._map)
+            else:
+                self._map_default(item, self._ident)
 
     def make_font(self, ttf_font: str) -> None:
         '''Generate TrueType font file.
 
         :arg ttf_font: File name of output font file.
         '''
-    #    self._make_charsets()
         self._font.generate(ttf_font)
 
-    def make_default_font(self, ttf_font: str) -> None:
-        '''Generate TrueType font file and modify default font.
+    #def make_default_font(self, ttf_font: str, default: dict) -> None:
+    #    '''Generate TrueType font file and modify default font.
 
-        :arg ttf_font: File name of output font file.
-        '''
-        pass
+    #    :arg ttf_font: File name of output font file.
+    #    :arg devault: Default font mappings.
+    #    '''
     #    self._glyph_width = self._font.em
     #    self._glyph_height = self._font.em
     #    self._glyph_offset = 0
@@ -135,5 +182,5 @@ class Font:
     #    self._font.hhea_descent = -self._font.descent
     #    self._font.hhea_linegap = 0
 
-    #    self._make_default_charset()
+    #    self._make_default_charset(default)
     #    self.make_font(ttf_font)

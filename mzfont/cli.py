@@ -6,7 +6,7 @@ from yaml import safe_load
 from . import doc_split
 from .meta import _copyright, _description, _info
 from .make_font import Font
-from .test_font import print_charsets
+from .test_font import print_charset
 
 
 def _parse_config():
@@ -19,16 +19,17 @@ def _get_system(systems, name):
     for system in systems:
         if system['name'] == name:
             return system
-    raise ValueError(f'System "{name}" not supported.')
+    return {}
 
 
 def systems():
     """ Show supported systems."""
     supported_systems = [sys['name'] for sys in _parse_config()['systems']]
-    stdout.write(f'Supported systems: {', '.join(supported_systems)}\n')
+    stdout.write(f'Supported systems: {", ".join(supported_systems)}\n')
 
 
-def make_font(system, glyphs_handle, firmware_handle, base_font, ttf_font):
+def make_font(
+        system, cgrom_handle, firmware_handle, base_font, ttf_font, default):
     config = _parse_config()
     system = _get_system(config['systems'], system)
     font = base_font or config['font']['base']
@@ -36,17 +37,17 @@ def make_font(system, glyphs_handle, firmware_handle, base_font, ttf_font):
     if 'map_offset' in system and not firmware_handle:
         raise ValueError('Firmware needed for this system, use `-f`.')
     font = Font(
-        glyphs_handle, firmware_handle,
-        system.get('map_offset', 0), system.get('mirror', False), font, system['name'])
-    for i, charset in enumerate(system['sets']):
-        font.make_charset(
-            0xe000 + 0x100 * i, charset['location'], charset.get('map', False))
+        cgrom_handle, font, system['name'],
+        firmware_handle,
+        system.get('map_offset', 0), system.get('mirror', False),
+        system['default'] if default else [])
+
     font.make_font(ttf_font)
 
 
 def make_default_font(
-        glyphs_handle, perm_handle, base_font, ttf_font, font_name):
-    mzfont = Font(glyphs_handle, perm_handle, base_font, font_name)
+        cgrom_handle, perm_handle, base_font, ttf_font, font_name):
+    mzfont = Font(cgrom_handle, perm_handle, base_font, font_name)
     mzfont.make_default_font(ttf_font)
 
 
@@ -55,7 +56,7 @@ def _arg_parser():
     make_parser.add_argument(
         'system', metavar='SYSTEM', type=str, help='system name')
     make_parser.add_argument(
-        'glyphs_handle', metavar='CG', type=FileType('rb'),
+        'cgrom_handle', metavar='CG', type=FileType('rb'),
         help='character rom file')
     make_parser.add_argument(
         'ttf_font', metavar='TTF', type=str,
@@ -66,6 +67,9 @@ def _arg_parser():
     make_parser.add_argument(
         '-b', dest='base_font', metavar='BASE', type=str, default='',
         help='base font file')
+    make_parser.add_argument(
+        '-d', dest='default', default=False, action='store_true',
+        help='generate default font')
 
     parser = ArgumentParser(
         description = _description, epilog=_copyright,
@@ -83,14 +87,17 @@ def _arg_parser():
         'make', parents=[make_parser], description=doc_split(Font.make_font))
     make_font_parser.set_defaults(func=make_font)
 
-    make_default_font_parser = subparsers.add_parser(
-        'default', parents=[make_parser],
-        description=doc_split(Font.make_default_font))
-    make_default_font_parser.set_defaults(func=make_default_font)
+    #make_default_font_parser = subparsers.add_parser(
+    #    'default', parents=[make_parser],
+    #    description=doc_split(Font.make_default_font))
+    #make_default_font_parser.set_defaults(func=make_default_font)
 
     test_font_parser = subparsers.add_parser(
-        'test', description=doc_split(print_charsets))
-    test_font_parser.set_defaults(func=print_charsets)
+        'test', description=doc_split(print_charset))
+    test_font_parser.add_argument(
+        'charset', metavar='CHARSET', type=int,
+        help='character set')
+    test_font_parser.set_defaults(func=print_charset)
 
     return parser
 

@@ -1,22 +1,17 @@
 from sys import stdout
 
 
-def print_charset(offset: int) -> None:
+def print_charset(charset: int) -> None:
     '''Print a character set.
 
     :arg offset: Character set offset relative to 0xe000.
     '''
-    for index in range(256):
-        stdout.write(f'{chr(offset + index)}')
-        if index % 16 == 15:
-            stdout.write('\n')
+    offset = 0xe000 + 0x100 * charset
 
-
-def print_charsets() -> None:
-    '''Print all character sets.'''
-    print('Interchange character set:')
-    print_charset(0xe000)
-    print('\nPrimary display character set:')
-    print_charset(0xe100)
-    print('\nAlternate display character set:')
-    print_charset(0xe200)
+    stdout.write('  | ' + ' '.join([f'{i:x}' for i in range(0x10)]) + '\n')
+    stdout.write(f'--+{"--" * 0x10}\n')
+    for i in range(0x10):
+        stdout.write(f'{i:x} |')
+        for j in range(0x10):
+            stdout.write(f' {chr(offset + (i << 4 | j))}')
+        stdout.write('\n')
