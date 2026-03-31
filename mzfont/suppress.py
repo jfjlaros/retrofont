@@ -1,8 +1,8 @@
 from os import O_RDWR, close, devnull, dup, dup2, open as os_open
 
 
-class suppress_output:
-    '''Context manager to suppress output.'''
+class Suppress:
+    """Context manager to suppress output."""
     def __enter__(self):
         self._stdout_fd = dup(1)
         self._stderr_fd = dup(2)

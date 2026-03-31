@@ -16,7 +16,7 @@ def make_matrix(l: list, dim: tuple) -> list[...]:
     return [make_matrix(l[i:i + size], sdim) for i in range(0, len(l), size)]
 
 
-def mirror(byte: int) -> int:
+def reverse(byte: int) -> int:
     """Reverse the bit order in a byte.
 
     :arg byte: Byte.

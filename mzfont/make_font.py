@@ -1,9 +1,9 @@
 from typing import BinaryIO
 
 from .math import make_matrix, pad
-from .suppress import suppress_output
+from .suppress import Suppress
 
-with suppress_output():
+with Suppress():
     from fontforge import font as ff_font
 from fontforge import open as ff_open
 from psMat import scale
@@ -49,7 +49,7 @@ class Font:
 
         self._char_offset = 0xe000
 
-        with suppress_output():
+        with Suppress():
             self._font = ff_open(base_font)
 
         if default:
