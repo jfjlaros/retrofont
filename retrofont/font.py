@@ -1,11 +1,11 @@
 from fontforge import open as ff_open
 
 from .suppress import Suppress
+from .trace import Glyph
 
 
 class Font:
-    def __init__(
-            self, base_font: str, font_name: str, native: bool=False) -> None:
+    def __init__(self, base_font: str, font_name: str) -> None:
         """8-bit TrueType font generator.
 
         :arg base_font: File name of base font file.
@@ -15,12 +15,10 @@ class Font:
             self._font = ff_open(base_font)
 
         self._offset = 0xe000
+        self._config()
         self._set_name(font_name)
 
-        if native:
-            self._config_native()
-        else:
-            self._config()
+        self._glyph = Glyph()
 
     def _config(self) -> None:
         self._glyph_width = self._font['space'].width
@@ -31,6 +29,43 @@ class Font:
         self._font.fontname = font_name
         self._font.familyname = font_name
         self._font.fullname = font_name
+
+    #def _testbit(self, byte: int, position: int) -> bool:
+    #    return byte & (1 << (7 - position))
+
+    #def _draw_pixel(self, pen: object, x: int, y: int) -> None:
+    #    width, height = self._glyph_width // 8, self._glyph_height // 8
+    #    pen.moveTo((width * x, height * (8 - y) + self._glyph_offset))
+    #    pen.lineTo((width * (x + 1), height * (8 - y) + self._glyph_offset))
+    #    pen.lineTo((width * (x + 1), height * (7 - y) + self._glyph_offset))
+    #    pen.lineTo((width * x, height * (7 - y) + self._glyph_offset))
+    #    pen.closePath()
+
+    #def _draw_glyph(self, code: int, glyph: list[bytes]) -> None:
+    #    char = self._font.createChar(code)
+    #    char.width = self._glyph_width
+
+    #    pen = char.glyphPen()
+    #    for y in range(8):
+    #        for x in range(8):
+    #            if self._testbit(glyph[y], x):
+    #                self._draw_pixel(pen, x, y)
+
+    def _draw_glyph(self, code: int, glyph: list[bytes]) -> None:
+        self._glyph.load_bin(glyph)
+        self._glyph.draw()
+
+        width, height = self._glyph_width // 8, self._glyph_height // 8
+
+        char = self._font.createChar(code)
+        char.width = self._glyph_width
+        pen = char.glyphPen()
+        for path in self._glyph.paths():
+            x, y = path[0]
+            pen.moveTo((width * x, height * y + self._glyph_offset))
+            for x, y in path[1:]:
+                pen.lineTo((width * x, height * y + self._glyph_offset))
+            pen.closePath()
 
     def config_native(self) -> None:
         """Configure font to use 8-bit characters natively."""
@@ -52,26 +87,13 @@ class Font:
         self._font.hhea_descent = -self._font.descent
         self._font.hhea_linegap = 0
 
-    def _testbit(self, byte: int, position: int) -> bool:
-        return byte & (1 << (7 - position))
+    def set_native(self, charset: list[...]) -> None:
+        """Set the native character set.
 
-    def _draw_pixel(self, pen: object, x: int, y: int) -> None:
-        width, height = self._glyph_width // 8, self._glyph_height // 8
-        pen.moveTo((width * x, height * (8 - y) + self._glyph_offset))
-        pen.lineTo((width * (x + 1), height * (8 - y) + self._glyph_offset))
-        pen.lineTo((width * (x + 1), height * (7 - y) + self._glyph_offset))
-        pen.lineTo((width * x, height * (7 - y) + self._glyph_offset))
-        pen.closePath()
-
-    def _draw_glyph(self, code: int, glyph: list[bytes]) -> None:
-        char = self._font.createChar(code)
-        char.width = self._glyph_width
-
-        pen = char.glyphPen()
-        for y in range(8):
-            for x in range(8):
-                if self._testbit(glyph[y], x):
-                    self._draw_pixel(pen, x, y)
+        :arg charset: Character set.
+        """
+        for index, glyph in enumerate(charset):
+            self._draw_glyph(index, glyph)
 
     def add_charset(self, charset: list[...]) -> None:
         """Add a character set to the UTF-8 user area.
@@ -82,17 +104,10 @@ class Font:
             self._draw_glyph(self._offset, glyph)
             self._offset += 1
 
-    def native_charset(self, charset: list[...]) -> None:
-        """Set the native character set.
-
-        :arg charset: Character set.
-        """
-        for index, glyph in enumerate(charset):
-            self._draw_glyph(index, glyph)
-
     def make_font(self, ttf_font: str) -> None:
         """Generate font file.
 
         :arg ttf_font: Font file name.
         """
         self._font.generate(ttf_font)
+        self._font.close()
