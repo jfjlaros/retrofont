@@ -1,39 +1,12 @@
+from copy import copy
 from sys import stdout
 
 
-class Drawing:
-    def __init__(self):
-        self._drawing = [[' '] * 17 for _ in range(17)]
-
-    def set(self, p, cell):
-        r, c = p
-        self._drawing[2 * r + 1][2 * c + 1] = cell
-
-    def get(self, p):
-        r, c = p
-        return drawing[2 * r + 1][2 * c + 1]
-
-    def border(self, p, d):
-        r, c = p
-        dr, dc = d
-        if self._drawing[2 * r + dr + 1][2 * c + dc + 1] != ' ':
-            print('OI')
-        # arrows = ('🡳', '🡲', '🡱', '🡰')
-        arrows = {(0, 1): '🡳', (-1, 0): '🡲', (0, -1): '🡱', (1, 0): '🡰'}
-        self._drawing[2 * r + dr + 1][2 * c + dc + 1] = arrows[d]
-        #self.print()
-
-    def print(self):
-        for line in self._drawing:
-            for cell in line:
-                stdout.write(cell)
-            stdout.write('\n')
-
-    def add_glyph(self, glyph):
-        for r, line in enumerate(glyph):
-            for c, cell in enumerate(line):
-                if cell == '#':
-                    self.set((r, c), cell)
+def double(iterable):
+    result = []
+    for item in iterable:
+        result += [copy(item), copy(item)]
+    return result
 
 
 def add(p1, p2):
@@ -53,22 +26,15 @@ def rotate_ccw(p):
 
 
 class Glyph:
-    _occupied = 0b10000000
-    _visited  = 0b01000000
-
     def __init__(self, glyph):
-        self._glyph = [[self._occupied if cell == '#' else 0 for cell in line] for line in glyph]
+        self._glyph = double([double(line) for line in glyph])
         self._position = (0, 0)
         self._direction = (0, 1)
 
-    def visit(self, p):
-        r, c = p
-        self._glyph[r][c] |= self._visited
-
     def get(self, p):
         r, c = p
-        if r < 0 or r > 7 or c < 0 or c > 7:
-            return 0
+        if r < 0 or r > 15 or c < 0 or c > 15:
+            return ' '
         return self._glyph[r][c]
 
     def rotate_cw(self):
@@ -77,14 +43,19 @@ class Glyph:
     def rotate_ccw(self):
         self._direction = rotate_ccw(self._direction)
 
-    def navigate(self):
+    def visit(self, p):
+        r, c = p
+        arrows = {(1, 0): '🡳', (0, 1): '🡲', (-1, 0): '🡱', (0, -1): '🡰'}
+        self._glyph[r][c] = arrows[self._direction]
+
+    def step(self):
         next_position = add(self._position, self._direction)
-        if not (self.get(next_position) & self._occupied):
+        if self.get(next_position) == ' ':
             self.rotate_cw()
             return
 
         next_border = add(next_position, rotate_ccw(self._direction))
-        if self.get(next_border) & self._occupied:
+        if self.get(next_border) != ' ':
             self.next()
             self.rotate_ccw()
         self.next()
@@ -94,157 +65,75 @@ class Glyph:
         self._position = add(self._position, self._direction)
 
     def find(self):
-        for r in range(8):
-            for c in range(8):
-                if self.get((r, c)) & self._occupied and not self.get((r - 1, c)):
-                    self._position = (r, c)
-                    return
+        for r in range(16):
+            for c in range(16):
+                if self.get((r, c)) == '·' and self.get((r - 1, c)) == ' ':
+                    yield (r, c)
 
-    def trace(self, drawing):
+    def trace(self, p):
         start = self._position
         start_direction = self._direction
         position = (-1, -1)
         direction = (-1, -1)
         while position != start or direction != start_direction:
-            drawing.border(self._position, rotate_ccw(self._direction))
-            self.navigate()
+            self.step()
             position = self._position
             direction = self._direction
-            #drawing.print()
-            #print()
 
-    def pictogram(self, cell):
-        if cell & self._visited:
-            return '·'
-        if cell & self._occupied:
-            return '#'
-        return ' '
+    def draw(self):
+        for p in self.find():
+            self._position = p
+            self.trace(p)
 
     def print(self):
         for line in self._glyph:
             for cell in line:
-                stdout.write(self.pictogram(cell))
+                stdout.write(cell)
             stdout.write('\n')
 
 
-glyph_test = [' ###### ',
-              '########',
-              '##    ##',
-              '########',
-              '########',
-              '##    ##',
-              '##    ##',
-              '##    ##']
+glyphs = [
+    [' ······ ',
+     '········',
+     '··    ··',
+     '········',
+     '········',
+     '··    ··',
+     '··    ··',
+     '··    ··'],
+    ['········',
+     '       ·',
+     '········',
+     '·       ',
+     '·       ',
+     '········',
+     '       ·',
+     '········'],
+    ['········',
+     '·      ·',
+     '· ···· ·',
+     '· ·  · ·',
+     '· ·  · ·',
+     '· ···· ·',
+     '·      ·',
+     '········'],
+    ['· · · · ',
+     ' · · · ·',
+     '· · · · ',
+     ' · · · ·',
+     '· · · · ',
+     ' · · · ·',
+     '· · · · ',
+     ' · · · ·'],
+    ['    ·   ',
+     '     ·  ',
+     '   · ·  ',
+     '   ··   ',
+     '    ·   ',
+     '     ···',
+     '··   · ·',
+     '··   ···']]
 
-glyph_bin = [0b01111110,
-             0b11111111,
-             0b11000011,
-             0b11111111,
-             0b11111111,
-             0b11000011,
-             0b11000011,
-             0b11000011]
-
-#glyph_test = ['########',
-#              '       #',
-#              '########',
-#              '#       ',
-#              '#       ',
-#              '########',
-#              '       #',
-#              '########']
-
-#glyph_test = ['########',
-#              '#      #',
-#              '# #### #',
-#              '# #  # #',
-#              '# #  # #',
-#              '# #### #',
-#              '#      #',
-#              '########']
-
-#glyph_test = ['        ',
-#              '        ',
-#              '     #  ',
-#              '   # #  ',
-#              '   ##   ',
-#              '    #   ',
-#              '        ',
-#              '        ']
-
-drawing = Drawing()
-#drawing.add_glyph(glyph_test)
-
-glyph = Glyph(glyph_test)
-glyph.find()
-glyph.trace(drawing)
+glyph = Glyph(glyphs[0])
+glyph.draw()
 glyph.print()
-print()
-
-glyph._position = (3, 2)
-glyph._direction = (0, 1)
-glyph.trace(drawing)
-glyph.print()
-print()
-
-drawing.print()
-
-# >###############  >...............
-# ################  ................
-#               ##                ..
-#               ##                ..
-# ################  ................
-# ################  ................
-# ##                ..
-# ##                ..
-# ##                ..
-# ##                ..
-# ################  ................
-# ################  ................
-#               ##                ..
-#               ##                ..
-# ################  ................
-# ################  ................
-# 
-# >###############  >...............  >...............  >...............  >...............
-# ################  .##############.  .##############.  .##############.  ................
-# ##            ##  .#            #.  .#            #.  .#            #.  ..            ..
-# ##            ##  .#            #.  .#            #.  .#            #.  ..            ..
-# ##  ########  ##  .#  >#######  #.  .#  >.......  #.  .#  >.......  #.  ..  >.......  ..
-# ##  ########  ##  .#  ########  #.  .#  .######.  #.  .#  ........  #.  ..  ........  ..
-# ##  ##    ##  ##  .#  ##    ##  #.  .#  .#    #.  #.  .#  ..    ..  #.  ..  ..    ..  ..
-# ##  ##    ##  ##  .#  ##    ##  #.  .#  .#    #.  #.  .#  ..    ..  #.  ..  ..    ..  ..
-# ##  ##    ##  ##  .#  ##    ##  #.  .#  .#    #.  #.  .#  ..    ..  #.  ..  ..    ..  ..
-# ##  ##    ##  ##  .#  ##    ##  #.  .#  .#    #.  #.  .#  ..    ..  #.  ..  ..    ..  ..
-# ##  ########  ##  .#  ########  #.  .#  .#>####.  #.  .#  ..>.....  #.  ..  ..>.....  ..
-# ##  ########  ##  .#  ########  #.  .#  ........  #.  .#  ........  #.  ..  ........  ..
-# ##            ##  .#            #.  .#            #.  .#            #.  ..            ..
-# ##            ##  .#            #.  .#            #.  .#            #.  ..            ..
-# ################  .##############.  .##############.  .#>############.  ..>.............
-# ################  ................  ................  ................  ................
-# 
-#   >###########      >...........      >...........
-#   ############      .##########.      .##########.
-# ################  ...##########...  ...##########...
-# ################  .##############.  .##..........##.
-# ####        ####  .###        ###.  .##.        .##.
-# ####        ####  .###        ###.  .##.        .##.
-# ################  .###>##########.  .##.>........##.
-# ################  .##############.  .##############.
-# ################  .##############.  .##############.
-# ################  .##..........##.  .##..........##.
-# ####        ####  .##.        .##.  .##.        .##.
-# ####        ####  .##.        .##.  .##.        .##.
-# ####        ####  .##.        .##.  .##.        .##.
-# ####        ####  .##.        .##.  .##.        .##.
-# ####        ####  .##.        .##.  .##.        .##.
-# ####        ####  ....        ....  ....        ....
-# 
-# >#        >.        >.        >.
-# ##        ..        ..        ..
-#   ######    >#####    >.....    >.....
-#   ######    ######    .####.    ......
-#   ##  ##    ##  ##    .#  #.    ..  ..
-#   ##  ##    ##  ##    .#  #.    ..  ..
-#   ######    ######    .#>##.    ..>...
-#   ######    ######    ......    ......
