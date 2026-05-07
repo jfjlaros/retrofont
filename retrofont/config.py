@@ -1,25 +1,31 @@
 from importlib import resources
+from os.path import exists, expanduser
 from yaml import safe_load
 
 
+def _get_config():
+    config_sys = str(resources.files() / 'config.yaml')
+    config_user = expanduser('~/.config/retrofont/config.yaml')
+    return config_user if exists(config_user) else config_sys
+
+
 def read_config():
+    """Read the content of the configuration file.
+
+    :return: Configuration.
     """
-    """
-    config_file = resources.files() / 'config.yaml'
-    with config_file.open("rt") as config:
+    config_file = _get_config()
+    with open(config_file, "rt") as config:
         return safe_load(config.read())
 
 
 def select_system(systems, name):
+    """Select a configured system.
+
+    :arg name: System name.
+    :return: System configuraion.
     """
-    """
-    system = {
-        'name': 'default',
-        'mirror': False,
-        'map_offset': 0,
-        'default': [{'source': 'raw', 'range': [0x00, 0x100]}]}
     for configured_system in systems:
         if configured_system['name'] == name:
-            system.update(configured_system)
-            return system
-    return system
+            return configured_system
+    return {}
