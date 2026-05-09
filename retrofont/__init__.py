@@ -1,6 +1,6 @@
 from typing import Callable
 
-from .make_font import Font
+from .font import Font
 
 
 def doc_split(func: Callable) -> str:

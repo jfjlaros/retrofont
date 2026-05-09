@@ -1,7 +1,7 @@
 Installation
 ============
 
-MzFont depends on FontForge_. For Debian based systems, the following command
+RetroFont depends on FontForge_. For Debian based systems, the following command
 will install this dependency.
 
 ::
@@ -13,14 +13,14 @@ access to system site-packages is enabled.
 
 ::
 
-    python -m venv --system-site-packages ~/.venv/mzfont
-    . ~/.venv/mzfont/bin/activate
+    python -m venv --system-site-packages ~/.venv/retrofont
+    . ~/.venv/retrofont/bin/activate
 
 The software is distributed via PyPI_, it can be installed with ``pip``:
 
 ::
 
-    pip install mzfont
+    pip install retrofont
 
 
 From source
@@ -31,12 +31,12 @@ use the following commands.
 
 ::
 
-    git clone https://github.com/jfjlaros/mzfont
-    cd mzfont
+    git clone https://github.com/jfjlaros/retrofont
+    cd retrofont
     pip install .
 
 
 .. _FontForge: https://fontforge.org
-.. _GitHub: https://github.com/jfjlaros/mzfont.git
-.. _PyPI: https://pypi.python.org/pypi/mzfont
+.. _GitHub: https://github.com/jfjlaros/retrofont.git
+.. _PyPI: https://pypi.python.org/pypi/retrofont
 

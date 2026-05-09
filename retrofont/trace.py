@@ -17,7 +17,7 @@ def rotate_ccw(p):
     return (-c, r)
 
 
-class Glyph:
+class Tracer:
     def __init__(self):
         self._glyph = [[' ' for _ in range(16)] for _ in range(16)]
         self._paths = []
@@ -32,7 +32,6 @@ class Glyph:
         r, c = p
         arrows = {(1, 0): '🡳', (0, 1): '🡲', (-1, 0): '🡱', (0, -1): '🡰'}
         self._glyph[r][c] = arrows[d]
-        #self.print()
 
     def _path_add(self):
         self._paths.append([])
@@ -75,7 +74,7 @@ class Glyph:
         while self._get(_p) == '·':
             _p, _d = self._navigate(_p, _d)
 
-    def _load(self, p, cell):
+    def _load_cell(self, p, cell):
         r, c = p
         self._glyph[2 * r][2 * c] = cell
         self._glyph[2 * r + 1][2 * c] = cell
@@ -85,13 +84,13 @@ class Glyph:
     def load(self, glyph):
         for r, line in enumerate(glyph):
             for c, cell in enumerate(line):
-                self._load((r, c), cell)
+                self._load_cell((r, c), cell)
         self._paths = []
 
     def load_bin(self, glyph):
         for r, line in enumerate(glyph):
             for c in range(8):
-                self._load((7 - c, 7 - r), '·' if line & 1 << c else ' ')
+                self._load_cell((7 - c, 7 - r), '·' if line & 1 << c else ' ')
         self._paths = []
 
     def draw(self):
@@ -112,50 +111,3 @@ class Glyph:
         for path in self.paths():
             stdout.write(f'{str(path)}\n')
         stdout.write('\n')
-
-
-if __name__ == '__main__':
-    glyphs = [
-        [' ······ ',
-         '········',
-         '··    ··',
-         '········',
-         '········',
-         '··    ··',
-         '··    ··',
-         '··    ··'],
-        ['········',
-         '·      ·',
-         '· ···· ·',
-         '· ·  · ·',
-         '· ·  · ·',
-         '· ···· ·',
-         '·      ·',
-         '········'],
-        ['    ·   ',
-         '     ·  ',
-         '   · ·  ',
-         '   ··   ',
-         '    ·   ',
-         '     ···',
-         '··   · ·',
-         '··   ···']]
-    
-    glyph_bin = [
-        0b11111111,
-        0b10000001,
-        0b10111101,
-        0b10100101,
-        0b10100101,
-        0b10111101,
-        0b10000001,
-        0b11111111]
-    
-    glyph = Glyph()
-    glyph.load_bin(glyph_bin)
-    glyph.draw()
-    glyph.print()
-    #for g in glyphs:
-    #    glyph.load(g)
-    #    glyph.draw()
-    #    glyph.print()

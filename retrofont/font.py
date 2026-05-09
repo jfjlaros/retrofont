@@ -1,7 +1,9 @@
-from fontforge import open as ff_open
-
 from .suppress import Suppress
-from .trace import Glyph
+
+with Suppress():
+    from fontforge import open as ff_open
+
+from .trace import Tracer
 
 
 class Font:
@@ -18,7 +20,7 @@ class Font:
         self._config()
         self._set_name(font_name)
 
-        self._glyph = Glyph()
+        self._tracer = Tracer()
 
     def _config(self) -> None:
         self._glyph_width = self._font['space'].width
@@ -30,45 +32,29 @@ class Font:
         self._font.familyname = font_name
         self._font.fullname = font_name
 
-    #def _testbit(self, byte: int, position: int) -> bool:
-    #    return byte & (1 << (7 - position))
-
-    #def _draw_pixel(self, pen: object, x: int, y: int) -> None:
-    #    width, height = self._glyph_width // 8, self._glyph_height // 8
-    #    pen.moveTo((width * x, height * (8 - y) + self._glyph_offset))
-    #    pen.lineTo((width * (x + 1), height * (8 - y) + self._glyph_offset))
-    #    pen.lineTo((width * (x + 1), height * (7 - y) + self._glyph_offset))
-    #    pen.lineTo((width * x, height * (7 - y) + self._glyph_offset))
-    #    pen.closePath()
-
-    #def _draw_glyph(self, code: int, glyph: list[bytes]) -> None:
-    #    char = self._font.createChar(code)
-    #    char.width = self._glyph_width
-
-    #    pen = char.glyphPen()
-    #    for y in range(8):
-    #        for x in range(8):
-    #            if self._testbit(glyph[y], x):
-    #                self._draw_pixel(pen, x, y)
-
-    def _draw_glyph(self, code: int, glyph: list[bytes]) -> None:
-        self._glyph.load_bin(glyph)
-        self._glyph.draw()
-
+    def _draw_path(self, pen: object, path: list[tuple]) -> None:
         width, height = self._glyph_width // 8, self._glyph_height // 8
 
+        x, y = path[0]
+        pen.moveTo((width * x, height * y + self._glyph_offset))
+        for x, y in path[1:]:
+            pen.lineTo((width * x, height * y + self._glyph_offset))
+        pen.closePath()
+
+    def _draw_paths(self, code: int) -> None:
         char = self._font.createChar(code)
         char.width = self._glyph_width
         pen = char.glyphPen()
-        for path in self._glyph.paths():
-            x, y = path[0]
-            pen.moveTo((width * x, height * y + self._glyph_offset))
-            for x, y in path[1:]:
-                pen.lineTo((width * x, height * y + self._glyph_offset))
-            pen.closePath()
+        for path in self._tracer.paths():
+            self._draw_path(pen, path)
 
-    def config_native(self) -> None:
-        """Configure font to use 8-bit characters natively."""
+    def _draw_glyph(self, code: int, glyph: list[bytes]) -> None:
+        self._tracer.load_bin(glyph)
+        self._tracer.draw()
+        self._draw_paths(code)
+
+    def config_primary(self) -> None:
+        """Use 8-bit characters in primary font."""
         self._glyph_width = self._font.em
         self._glyph_height = self._font.em
         self._glyph_offset = 0
@@ -87,8 +73,8 @@ class Font:
         self._font.hhea_descent = -self._font.descent
         self._font.hhea_linegap = 0
 
-    def set_native(self, charset: list[...]) -> None:
-        """Set the native character set.
+    def set_primary(self, charset: list[...]) -> None:
+        """Set the primary character set.
 
         :arg charset: Character set.
         """

@@ -9,7 +9,7 @@ mock = ModuleType('psMat')
 mock.scale = object
 modules['psMat'] = mock
 
-from mzfont.meta import _author, _copyright, _project, _version
+from retrofont.meta import _author, _copyright, _project, _version
 
 
 author = _author

@@ -1,76 +1,53 @@
 from argparse import RawDescriptionHelpFormatter, ArgumentParser, FileType
-from importlib import resources
-from sys import stdout
-from yaml import safe_load
+from os.path import expanduser
+from typing import BinaryIO
 
 from . import doc_split
+from .charset import (
+    map_charset, map_charsets, read_keymap, read_map, read_rom)
+from .config import read_config, select_system
+from .font import Font
 from .meta import _copyright, _description, _info
-from .make_font import Font
+from .font import Font
 from .test_font import print_charset
 
 
-def _parse_config():
-    config_file = resources.files() / 'config.yaml'
-    with config_file.open("rt") as config:
-        return safe_load(config.read())
-
-
-def _get_system(systems, name):
-    for system in systems:
-        if system['name'] == name:
-            return system
-    return {}
-
-
-def systems():
-    """ Show supported systems."""
-    supported_systems = [sys['name'] for sys in _parse_config()['systems']]
-    stdout.write(f'Supported systems: {", ".join(supported_systems)}\n')
-
-
 def make_font(
-        system, cgrom_handle, firmware_handle, base_font, ttf_font, default):
-    config = _parse_config()
-    system = _get_system(config['systems'], system)
-    font = base_font or config['font']['base']
+        name: str, cgrom: BinaryIO, fwrom: BinaryIO=None, sys_type: str='',
+        dest: str='.', primary: bool=False) -> None:
+    """Create a TrueType font.
 
-    if 'map_offset' in system and not firmware_handle:
-        raise ValueError('Firmware needed for this system, use `-f`.')
-    font = Font(
-        cgrom_handle, font, system['name'],
-        firmware_handle,
-        system.get('map_offset', 0), system.get('mirror', False),
-        system['default'] if default else [])
+    :arg name: Font name.
+    :arg gcrom: Character ROM file.
+    :arg fwrom: Firmware ROM file.
+    :arg sys_type: System type.
+    :arg dest: Destination directory.
+    :art primary: Generate primary font.
+    """
+    config = read_config()
+    system = select_system(config['systems'], sys_type)
+    charsets = read_rom(cgrom, mirror=system.get('mirror', False))
 
-    font.make_font(ttf_font)
+    font = Font(config['font']['base'], name)
+    if primary:
+        font.config_primary()
+        keymap = system.get('primary', {})
+        primary_charset = map_charset(charsets[0], read_keymap(keymap))
+        font.set_primary(primary_charset)
 
+    if fwrom:
+        permutation = read_map(fwrom, system.get('map_offset', 0))
+        permuted = map_charsets(charsets, permutation)
+        for charset in permuted:
+            font.add_charset(charset)
 
-def make_default_font(
-        cgrom_handle, perm_handle, base_font, ttf_font, font_name):
-    mzfont = Font(cgrom_handle, perm_handle, base_font, font_name)
-    mzfont.make_default_font(ttf_font)
+    for charset in charsets:
+        font.add_charset(charset)
+
+    font.make_font(expanduser(f'{dest}/{name}.ttf'))
 
 
 def _arg_parser():
-    make_parser = ArgumentParser(add_help=False)
-    make_parser.add_argument(
-        'system', metavar='SYSTEM', type=str, help='system name')
-    make_parser.add_argument(
-        'cgrom_handle', metavar='CG', type=FileType('rb'),
-        help='character rom file')
-    make_parser.add_argument(
-        'ttf_font', metavar='TTF', type=str,
-        help='output file')
-    make_parser.add_argument(
-        '-f', dest='firmware_handle', type=FileType('rb'), default=None,
-        help='firmware rom file')
-    make_parser.add_argument(
-        '-b', dest='base_font', metavar='BASE', type=str, default='',
-        help='base font file')
-    make_parser.add_argument(
-        '-d', dest='default', default=False, action='store_true',
-        help='generate default font')
-
     parser = ArgumentParser(
         description = _description, epilog=_copyright,
         formatter_class=RawDescriptionHelpFormatter)
@@ -80,17 +57,25 @@ def _arg_parser():
     subparsers.required = True
 
     make_font_parser = subparsers.add_parser(
-        'systems', description=doc_split(systems))
-    make_font_parser.set_defaults(func=systems)
-
-    make_font_parser = subparsers.add_parser(
-        'make', parents=[make_parser], description=doc_split(Font.make_font))
+        'make', description=doc_split(make_font))
+    make_font_parser.add_argument(
+        'name', metavar='NAME', type=str, help='font name')
+    make_font_parser.add_argument(
+        'cgrom', metavar='CGROM', type=FileType('rb'),
+        help='character ROM file')
+    make_font_parser.add_argument(
+        '-f', dest='fwrom', type=FileType('rb'), default=None,
+        help='firmware ROM file')
+    make_font_parser.add_argument(
+        '-s', dest='sys_type', type=str, default='',
+        help='system name')
+    make_font_parser.add_argument(
+        '-d', dest='dest', type=str, default='.',
+        help='destination directory')
+    make_font_parser.add_argument(
+        '-p', dest='primary', default=False, action='store_true',
+        help='generate primary font')
     make_font_parser.set_defaults(func=make_font)
-
-    #make_default_font_parser = subparsers.add_parser(
-    #    'default', parents=[make_parser],
-    #    description=doc_split(Font.make_default_font))
-    #make_default_font_parser.set_defaults(func=make_default_font)
 
     test_font_parser = subparsers.add_parser(
         'test', description=doc_split(print_charset))

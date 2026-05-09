@@ -15,7 +15,7 @@ def read_rom(handle: BinaryIO, mirror: bool=False) -> list[...]:
 
     if mirror:
         data = bytes(map(reverse, data))
-    data += b'\x00' * pad(len(data), 256)
+    data += b'\x00' * pad(len(data), 2048)
 
     return make_matrix(data, (256, 8))
 
@@ -32,8 +32,24 @@ def read_map(handle: BinaryIO, offset: int) -> list[int]:
     return list(handle.read(256))
 
 
+def read_keymap(keymap: dict) -> list[...]:
+    """
+    """
+    if not keymap:
+        return [i for i in range(0x100)]
+
+    permutation = [0x00 for _ in range(0x100)]
+    for character_block in keymap.get('character_blocks', []):
+        shift = character_block[0] - character_block[1][0]
+        for i in range(*character_block[1]):
+            permutation[i + shift] = i
+    for character in keymap.get('characters', []):
+        permutation[character[0]] = character[1]
+    return permutation
+
+
 def map_charset(charset: list[bytes], permutation: list[int]) -> list[bytes]:
-    """Permuta a character set.
+    """Permute a character set.
 
     :arg charset: Character set.
     :arg permutation: Permutation.
@@ -44,7 +60,7 @@ def map_charset(charset: list[bytes], permutation: list[int]) -> list[bytes]:
 
 
 def map_charsets(charsets: list[...], permutation: list[int]) -> list[...]:
-    """Permuta a list of character sets.
+    """Permute a list of character sets.
 
     :arg charsets: List of character sets.
     :arg permutation: Permutation.

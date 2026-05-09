@@ -3,13 +3,14 @@ requires = ['hatchling', 'pyyaml']
 build-backend = 'hatchling.build'
 
 [project]
-name = 'mzfont'
+name = 'retrofont'
 dynamic = [
   'authors', 'classifiers', 'description', 'keywords', 'license',
-  'license-files', 'readme', 'version']
+  'license-files', 'version']
+readme = 'README.rst'
 
 [project.scripts]
-mzfont = 'mzfont:cli.main'
+retrofont = 'retrofont:cli.main'
 
 [tool.hatch.metadata.hooks.custom]
-path = 'mzfont/meta.py'
+path = 'retrofont/meta.py'

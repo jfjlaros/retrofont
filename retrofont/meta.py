@@ -3,12 +3,12 @@ from hatchling.metadata.plugin.interface import MetadataHookInterface
 
 _author = 'Jeroen F.J. Laros'
 _email = 'jlaros@fixedpoint.nl'
-_description = 'Sharp MZ TrueType font.'
-_keywords = ['Sharp', 'MZ', 'font', 'TrueType']
+_description = 'TrueType retro fonts.'
+_keywords = ['retro', 'font', 'TrueType']
 _license = 'MIT'
-_project = 'MzFont'
-_url = 'https://github.com/jfjlaros/mzfont'
-_version = '0.0.4'
+_project = 'RetroFont'
+_url = 'https://github.com/jfjlaros/retrofont'
+_version = '0.0.1'
 _year = '2025'
 
 _classifiers = [

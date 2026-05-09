@@ -15,7 +15,7 @@ character set is stored ad 0xe200. The default font is left unchanged.
 
 .. code:: bash
 
-    mzfont make mz700fon.int 1z-013a.rom ~/.local/share/fonts/SharpMZ.ttf
+    retrofont make mz700fon.int 1z-013a.rom ~/.local/share/fonts/SharpMZ.ttf
     fc-cache -fv ~/.local/share/fonts
 
 Open a new terminal that uses the Sharp MZ font.
@@ -35,7 +35,7 @@ characters and removes line spacing.
 
 .. code:: bash
 
-    mzfont default mz700fon.int 1z-013a.rom ~/.local/share/fonts/SharpMZD.ttf
+    retrofont default mz700fon.int 1z-013a.rom ~/.local/share/fonts/SharpMZD.ttf
     fc-cache -fv ~/.local/share/fonts
 
 Open a new terminal that uses the Sharp MZ default font.
@@ -54,7 +54,7 @@ The `test` subcommand shows all three character sets.
 
 ::
 
-    mzfont test
+    retrofont test
 
 If the `make` subcommand was used to create the font, the output should look as
 follows.
