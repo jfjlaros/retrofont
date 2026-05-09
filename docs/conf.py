@@ -19,4 +19,4 @@ release = _version
 
 autoclass_content = 'both'
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx_autodoc_typehints', 'sphinxarg.ext']
+    'sphinx.ext.autodoc', 'sphinx_autodoc_typehints']
