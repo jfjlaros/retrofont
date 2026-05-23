@@ -1,4 +1,6 @@
+from functools import reduce
 from math import log, prod
+from operator import add
 
 
 def make_matrix(l: list, dim: tuple) -> list[...]:
@@ -14,6 +16,18 @@ def make_matrix(l: list, dim: tuple) -> list[...]:
     size = prod(dim)
     sdim = dim[1:]
     return [make_matrix(l[i:i + size], sdim) for i in range(0, len(l), size)]
+
+
+def flatten_matrix(m: list[...]) -> list:
+    """Make a flat list from an n-dimensional matrix.
+
+    :arg m: Matrix.
+
+    :return: List.
+    """
+    if not isinstance(m, list):
+        return [m]
+    return list(reduce(add, [flatten_matrix(s) for s in m], []))
 
 
 def reverse(byte: int) -> int:

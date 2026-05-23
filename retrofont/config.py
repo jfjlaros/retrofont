@@ -9,7 +9,7 @@ def _get_config():
     return config_user if exists(config_user) else config_sys
 
 
-def read_config():
+def read_config() -> dict:
     """Read the content of the configuration file.
 
     :return: Configuration.
@@ -19,7 +19,7 @@ def read_config():
         return safe_load(config.read())
 
 
-def select_system(systems, name):
+def select_system(systems: dict, name: str) -> dict:
     """Select a configured system.
 
     :arg name: System name.
