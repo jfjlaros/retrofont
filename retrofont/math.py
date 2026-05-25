@@ -30,7 +30,7 @@ def flatten_matrix(m: list[...]) -> list:
     return list(reduce(add, [flatten_matrix(s) for s in m], []))
 
 
-def reverse(byte: int) -> int:
+def reverse_byte(byte: int) -> int:
     """Reverse the bit order in a byte.
 
     :arg byte: Byte.
@@ -44,7 +44,7 @@ def reverse(byte: int) -> int:
     return mirrored
 
 
-def pad(size: int, block_size: int) -> int:
+def pad_block(size: int, block_size: int) -> int:
     """Calculate number of padding bytes.
 
     :arg size: Number of bytes.
@@ -54,3 +54,38 @@ def pad(size: int, block_size: int) -> int:
     """
     bits = int(log(block_size, 2))
     return ((size - 1 >> bits) + 1 << bits) - size
+
+
+def add_tuples(t1: tuple[int], t2: tuple[int]) -> tuple[int]:
+    """Add two 2-tuples.
+
+    :arg t1: A 2-tuple.
+    :arg t2: A 2-tuple.
+
+    :return: Result of `t1` + `t2`.
+    """
+    x1, y1 = t1
+    x2, y2 = t2
+    return (x1 + x2, y1 + y2)
+
+
+def rotate_tuple_cw(t: tuple[int]) -> tuple[int]:
+    """Rotate a 2-tuple 90 degrees clockwise.
+
+    :arg t: A 2-tuple.
+
+    :return: Rotation of `t`.
+    """
+    x, y = t
+    return (y, -x)
+
+
+def rotate_tuple_ccw(t: tuple[int]) -> tuple[int]:
+    """Rotate a 2-tuple 90 degrees counterclockwise.
+
+    :arg t: A 2-tuple.
+
+    :return: Rotation of `t`.
+    """
+    x, y = t
+    return (-y, x)

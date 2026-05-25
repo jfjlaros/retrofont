@@ -6,9 +6,9 @@ from yaml import safe_dump, safe_load
 
 from . import doc_split
 from .font import (
-    map_charset, map_font, keymap_to_permutation, rom_to_font, visualise,
-    yaml_to_font, font_to_yaml, font_to_rom)
-from .config import read_config, select_system
+    map_charset, map_font, keymap_to_permutation, rom_to_font,
+    visualise_charset, yaml_to_font, font_to_yaml, font_to_rom)
+from .config import read_config, select_system_config
 from .ttf import TTF
 from .meta import _copyright, _description, _info
 
@@ -16,17 +16,9 @@ from .meta import _copyright, _description, _info
 def rom2ttf(
         name: str, cgrom: BinaryIO, fwrom: BinaryIO=None, sys_type: str='',
         dest: str='.', primary: bool=False) -> None:
-    """Create a TrueType font.
-
-    :arg name: Font name.
-    :arg gcrom: Character ROM file.
-    :arg fwrom: Firmware ROM file.
-    :arg sys_type: System type.
-    :arg dest: Destination directory.
-    :art primary: Generate primary font.
-    """
+    """Create a TrueType font."""
     config = read_config()
-    system = select_system(config['systems'], sys_type)
+    system = select_system_config(config['systems'], sys_type)
     font = rom_to_font(cgrom.read(), mirror=system.get('mirror', False))
 
     ttf = TTF(config['font']['base'], name)
@@ -50,30 +42,24 @@ def rom2ttf(
 
 
 def yml2rom(text_handle: TextIO, binary_handle: BinaryIO) -> None:
-    """
-    """
+    """Create a character ROM from its YAML representation."""
     font = yaml_to_font(safe_load(text_handle))
     binary_handle.write(font_to_rom(font))
 
 
 def rom2yml(binary_handle: BinaryIO, text_handle: TextIO) -> None:
-    """
-    """
+    """Create the YAML representation of a character ROM file."""
     font = rom_to_font(binary_handle.read())
     text_handle.write(safe_dump(font_to_yaml(font)))
 
 
 def show_charset(handle: TextIO, charset: int) -> None:
-    """Print a character set.
-
-    :arg handle: Handle to output text stream.
-    :arg charset: Character set number.
-    """
+    """Show a character set."""
     offset = 0xe000 + 0x100 * charset if charset != -1 else 0
-    handle.write('\n'.join(visualise(offset)) + '\n')
+    handle.write('\n'.join(visualise_charset(offset)) + '\n')
 
 
-def _arg_parser():
+def _arg_parser() -> object:
     parser = ArgumentParser(
         description = _description, epilog=_copyright,
         formatter_class=RawDescriptionHelpFormatter)
@@ -136,7 +122,7 @@ def _arg_parser():
     return parser
 
 
-def main():
+def main() -> None:
     parser = _arg_parser()
 
     try:

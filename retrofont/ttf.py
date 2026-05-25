@@ -24,17 +24,17 @@ class TTF:
 
         self._tracer = Tracer()
 
-    def _config(self):
+    def _config(self) -> None:
         self._glyph_width = self._font['space'].width
         self._glyph_height = self._font.em + self._font.os2_typolinegap
         self._glyph_offset = -self._font.descent
 
-    def _set_name(self, font_name):
+    def _set_name(self, font_name: str) -> None:
         self._font.fontname = font_name
         self._font.familyname = font_name
         self._font.fullname = font_name
 
-    def _draw_path(self, pen, path):
+    def _draw_path(self, pen: object, path: list[int]) -> None:
         width, height = self._glyph_width // 8, self._glyph_height // 8
 
         r, c = path[0]
@@ -43,15 +43,15 @@ class TTF:
             pen.lineTo((width * c, height * (8 - r) + self._glyph_offset))
         pen.closePath()
 
-    def _draw_paths(self, code):
+    def _draw_paths(self, code: int) -> None:
         char = self._font.createChar(code)
         char.clear()
         char.width = self._glyph_width
         pen = char.glyphPen()
-        for path in self._tracer.paths():
+        for path in self._tracer.get_paths():
             self._draw_path(pen, path)
 
-    def _draw_glyph(self, code, glyph):
+    def _draw_glyph(self, code: int, glyph: bytes) -> None:
         self._tracer.load(glyph)
         self._tracer.trace()
         self._draw_paths(code)
@@ -76,7 +76,7 @@ class TTF:
         self._font.hhea_descent = -self._font.descent
         self._font.hhea_linegap = 0
 
-    def set_primary(self, charset: list[...]) -> None:
+    def set_primary(self, charset: list[bytes]) -> None:
         """Set the primary character set.
 
         :arg charset: Character set.
@@ -84,7 +84,7 @@ class TTF:
         for index, glyph in enumerate(charset):
             self._draw_glyph(index, glyph)
 
-    def add_charset(self, charset: list[...]) -> None:
+    def add_charset(self, charset: list[bytes]) -> None:
         """Add a character set to the UTF-8 user area.
 
         :arg charset: Character set.

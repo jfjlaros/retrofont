@@ -1,23 +1,54 @@
-from copy import copy
-
-from .glyph import decode, encode
-from .math import flatten_matrix, make_matrix, pad, reverse
+from .glyph import decode_glyph, encode_glyph
+from .math import flatten_matrix, make_matrix, pad_block, reverse_byte
 
 
-def yaml_to_font(yaml_font: list[dict]) -> list[...]:
+def rom_to_font(data: bytes, mirror: bool=False) -> list[list[bytes]]:
+    """Deserialise ROM content to a font.
+
+    :arg data: Character ROM content.
+    :arg mirror: Reverse bit order.
+
+    :return: Font.
     """
+    if mirror:
+        data = bytes(map(reverse_byte, data))
+    data += b'\x00' * pad_block(len(data), 2048)
+
+    return make_matrix(data, (256, 8))
+
+
+def font_to_rom(font: list[list[bytes]]) -> bytes:
+    """Serialise a front to ROM content.
+
+    :arg font: Font.
+
+    :return: Character ROM content.
+    """
+    return b''.join(flatten_matrix(font))
+
+
+def yaml_to_font(yaml_font: list[dict]) -> list[list[bytes]]:
+    """Convert a font from its YAML representation.
+
+    :arg yaml_font: YAML representation of a font.
+
+    :return: Font.
     """
     font = []
     for yaml_charset in yaml_font:
         charset = [b'\x00' * 8 for _ in range(256)]
         for yaml_glyph in yaml_charset:
-            charset[yaml_glyph['offset']] = encode(yaml_glyph['data'])
+            charset[yaml_glyph['offset']] = encode_glyph(yaml_glyph['data'])
         font.append(charset)
     return font
 
 
-def font_to_yaml(font: list[...]) -> list[dict]:
-    """
+def font_to_yaml(font: list[list[bytes]]) -> list[dict]:
+    """Convert a font to its YAML representation.
+
+    :arg font: Font.
+
+    :return: YAML representation of `font`.
     """
     yaml_font = []
     for charset in font:
@@ -25,34 +56,17 @@ def font_to_yaml(font: list[...]) -> list[dict]:
         for i, glyph in enumerate(charset):
             if glyph != b'\x00\x00\x00\x00\x00\x00\x00\x00':
                 yaml_charset.append(
-                    {'offset': i, 'data': decode(glyph)})
+                    {'offset': i, 'data': decode_glyph(glyph)})
         yaml_font.append(yaml_charset)
     return yaml_font
 
 
-def rom_to_font(data: bytes, mirror: bool=False) -> list[...]:
-    """Read the content of a character ROM.
+def keymap_to_permutation(keymap: dict) -> list:
+    """Convert a key mapping table to a character set permutation.
 
-    :arg data: Character ROM content.
-    :arg mirror: Reverse bit order.
+    :arg keymap: Key mapping table.
 
-    :return: Character sets.
-    """
-    if mirror:
-        data = bytes(map(reverse, data))
-    data += b'\x00' * pad(len(data), 2048)
-
-    return make_matrix(data, (256, 8))
-
-
-def font_to_rom(font: list[...]) -> bytes:
-    """
-    """
-    return b''.join(flatten_matrix(font))
-
-
-def keymap_to_permutation(keymap: dict) -> list[...]:
-    """
+    :return: Permutation table.
     """
     if not keymap:
         return [i for i in range(0x100)]
@@ -71,14 +85,15 @@ def map_charset(charset: list[bytes], permutation: list[int]) -> list[bytes]:
     """Permute a character set.
 
     :arg charset: Character set.
-    :arg permutation: Permutation.
+    :arg permutation: Permutation table.
 
     :return: Permuted character set.
     """
     return [charset[index] for index in permutation]
 
 
-def map_font(font: list[...], permutation: list[int]) -> list[...]:
+def map_font(
+        font: list[list[bytes]], permutation: list[int]) -> list[list[bytes]]:
     """Permute a list of character sets.
 
     :arg font: List of character sets.
@@ -89,7 +104,7 @@ def map_font(font: list[...], permutation: list[int]) -> list[...]:
     return [map_charset(charset, permutation) for charset in font]
 
 
-def _printable(character):
+def _printable(character: bytes) -> str:
     if character < 0x20:
         return ' '
     if character > 0x7e and character < 0xa0:
@@ -97,8 +112,12 @@ def _printable(character):
     return chr(character)
 
 
-def visualise(offset: int) -> list[str]:
-    """
+def visualise_charset(offset: int) -> list[str]:
+    """Visualise a character set.
+
+    :arg offset: Start address of the character set.
+
+    :return: Visualition of the character set.
     """
     charset = []
     charset.append('  | ' + ' '.join([f'{i:x}' for i in range(0x10)]))
