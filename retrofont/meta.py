@@ -8,7 +8,7 @@ _keywords = ['retro', 'font', 'TrueType']
 _license = 'MIT'
 _project = 'RetroFont'
 _url = 'https://github.com/jfjlaros/retrofont'
-_version = '0.0.1'
+_version = '0.0.3'
 _year = '2025'
 
 _classifiers = [

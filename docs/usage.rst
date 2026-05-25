@@ -16,7 +16,7 @@ character set is stored ad 0xe200. The default font is left unchanged.
 .. code:: bash
 
     retrofont make mz700fon.int 1z-013a.rom ~/.local/share/fonts/SharpMZ.ttf
-    fc-cache -fv ~/.local/share/fonts
+    fc-cache -f
 
 Open a new terminal that uses the Sharp MZ font.
 
@@ -36,7 +36,7 @@ characters and removes line spacing.
 .. code:: bash
 
     retrofont default mz700fon.int 1z-013a.rom ~/.local/share/fonts/SharpMZD.ttf
-    fc-cache -fv ~/.local/share/fonts
+    fc-cache -f
 
 Open a new terminal that uses the Sharp MZ default font.
 
