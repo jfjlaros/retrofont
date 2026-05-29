@@ -1,38 +1,40 @@
-from .suppress import Suppress
-
-with Suppress():
-    from fontforge import open as ff_open
+from fontTools.ttLib import TTFont
+from fontTools.pens.ttGlyphPen import TTGlyphPen
 
 from .trace import Tracer
 
 
 class TTF:
-    """
-    """
+    """TrueType font generator."""
     def __init__(self, base_font: str, font_name: str) -> None:
         """8-bit TrueType font generator.
 
         :arg base_font: File name of base font file.
         :arg font_name: Font name.
         """
-        with Suppress():
-            self._font = ff_open(base_font)
+        self._font = TTFont(base_font)
+        self._glyphs = self._font.getGlyphSet()
 
         self._offset = 0xe000
         self._config()
         self._set_name(font_name)
 
+        self._cmap_tables = list(
+            filter(lambda x: x.isUnicode(), self._font['cmap'].tables))
+
         self._tracer = Tracer()
 
     def _config(self) -> None:
-        self._glyph_width = self._font['space'].width
-        self._glyph_height = self._font.em + self._font.os2_typolinegap
-        self._glyph_offset = -self._font.descent
+        self._glyph_width = self._glyphs.get('space').width
+        self._glyph_offset = self._font['OS/2'].sTypoDescender
+        self._glyph_height = (self._font['OS/2'].sTypoAscender
+            + self._font['OS/2'].sTypoLineGap - self._glyph_offset)
 
     def _set_name(self, font_name: str) -> None:
-        self._font.fontname = font_name
-        self._font.familyname = font_name
-        self._font.fullname = font_name
+        self._font['name'].setName(font_name, 1, 3, 1, 0x409)
+        self._font['name'].setName('Regular', 2, 3, 1, 0x409)
+        self._font['name'].setName(f'{font_name} Regular', 4, 3, 1, 0x409)
+        self._font['name'].setName(f'{font_name}-Regular', 6, 3, 1, 0x409)
 
     def _draw_path(self, pen: object, path: list[int]) -> None:
         width, height = self._glyph_width // 8, self._glyph_height // 8
@@ -44,12 +46,16 @@ class TTF:
         pen.closePath()
 
     def _draw_paths(self, code: int) -> None:
-        char = self._font.createChar(code)
-        char.clear()
-        char.width = self._glyph_width
-        pen = char.glyphPen()
+        pen = TTGlyphPen(self._glyphs)
         for path in self._tracer.get_paths():
             self._draw_path(pen, path)
+
+        glyph_name = f'uni{code:04x}'
+        self._font['glyf'][glyph_name] = pen.glyph()
+        self._font['hmtx'][glyph_name] = (self._glyph_width, 0)
+
+        for table in self._cmap_tables:
+            table.cmap[code] = glyph_name
 
     def _draw_glyph(self, code: int, glyph: bytes) -> None:
         self._tracer.load(glyph)
@@ -58,23 +64,19 @@ class TTF:
 
     def config_primary(self) -> None:
         """Use 8-bit characters in primary font."""
-        self._glyph_width = self._font.em
-        self._glyph_height = self._font.em
+        self._glyph_height = self._glyph_width
         self._glyph_offset = 0
 
-        self._font.ascent = self._font.em
-        self._font.descent = 0
+        self._font['OS/2'].sTypoAscender = self._glyph_height
+        self._font['OS/2'].sTypoDecender = 0
+        self._font['OS/2'].sTypoLineGap = 0
 
-        self._font.os2_typoascent = self._font.ascent
-        self._font.os2_typodescent = -self._font.descent
-        self._font.os2_typolinegap = 0
+        self._font['OS/2'].usWinAscent = self._glyph_height
+        self._font['OS/2'].usWinDescent = 0
 
-        self._font.os2_winascent = self._font.ascent
-        self._font.os2_windescent = self._font.descent
-
-        self._font.hhea_ascent = self._font.ascent
-        self._font.hhea_descent = -self._font.descent
-        self._font.hhea_linegap = 0
+        self._font['hhea'].ascent = self._glyph_height
+        self._font['hhea'].descent = 0
+        self._font['hhea'].linegap = 0
 
     def set_primary(self, charset: list[bytes]) -> None:
         """Set the primary character set.
@@ -98,5 +100,5 @@ class TTF:
 
         :arg ttf_font: Font file name.
         """
-        self._font.generate(ttf_font)
+        self._font.save(ttf_font)
         self._font.close()

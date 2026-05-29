@@ -1,21 +1,6 @@
 Installation
 ============
 
-RetroFont depends on FontForge_. For Debian based systems, the following command
-will install this dependency.
-
-::
-
-    apt install python3-fontforge
-
-If the software is to be installed in a virtual environment, make sure that
-access to system site-packages is enabled.
-
-::
-
-    python -m venv --system-site-packages ~/.venv/retrofont
-    . ~/.venv/retrofont/bin/activate
-
 The software is distributed via PyPI_, it can be installed with ``pip``:
 
 ::

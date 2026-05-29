@@ -8,8 +8,11 @@ dynamic = [
   'authors', 'classifiers', 'description', 'keywords', 'license',
   'license-files', 'version']
 readme = 'README.rst'
+
 dependencies = [
-  "pyyaml"]
+  'fonttools',
+  'hatchling',
+  'pyyaml']
 
 [project.scripts]
 retrofont = 'retrofont:cli.main'
