@@ -1,10 +1,24 @@
 from typing import Iterator
 
 from .glyph import Pixel, traverse_glyph
-from .math import add_tuples, rotate_tuple_cw, rotate_tuple_ccw
+from .math import (
+    add_tuples, flatten_matrix, rotate_tuple_cw, rotate_tuple_ccw)
+
+
+def get_lsb(paths: list[list[tuple[int, int]]]) -> int:
+    """Find the left-side border of a glyph.
+
+    :arg paths: Glyph outlines.
+
+    :return: Left-side border of the glyph.
+    """
+    if not paths:
+        return 0
+    return min(point[1] for point in flatten_matrix(paths))
+
 
 class Tracer:
-    """Glyph tracing method."""
+    """Glyph tracer."""
     def __init__(self):
         self._glyph = [[Pixel.empty] * 18 for _ in range(18)]
         self._paths = []

@@ -1,14 +1,13 @@
 from fontTools.ttLib import TTFont
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 
-from .trace import Tracer
+from .trace import Tracer, get_lsb
 
 
 class TTF:
     """TrueType font generator."""
     def __init__(self, base_font: str, font_name: str) -> None:
-        """8-bit TrueType font generator.
-
+        """
         :arg base_font: File name of base font file.
         :arg font_name: Font name.
         """
@@ -46,13 +45,16 @@ class TTF:
         pen.closePath()
 
     def _draw_paths(self, code: int) -> None:
+        paths = self._tracer.get_paths()
         pen = TTGlyphPen(self._glyphs)
-        for path in self._tracer.get_paths():
+        for path in paths:
             self._draw_path(pen, path)
 
         glyph_name = f'uni{code:04x}'
         self._font['glyf'][glyph_name] = pen.glyph()
-        self._font['hmtx'][glyph_name] = (self._glyph_width, 0)
+
+        lsb = get_lsb(paths) * self._glyph_width // 8
+        self._font['hmtx'][glyph_name] = (self._glyph_width, lsb)
 
         for table in self._cmap_tables:
             table.cmap[code] = glyph_name
@@ -64,6 +66,7 @@ class TTF:
 
     def config_primary(self) -> None:
         """Use 8-bit characters in primary font."""
+        self._glyph_width = 2048
         self._glyph_height = self._glyph_width
         self._glyph_offset = 0
 

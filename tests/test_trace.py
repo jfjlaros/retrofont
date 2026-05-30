@@ -1,6 +1,10 @@
-from retrofont.trace import Tracer
+from retrofont.trace import Tracer, get_lsb
 
 from shared import test_glyph
+
+
+def test_get_lsb():
+    assert get_lsb([[(0, 5), (0, 6)], [(0, 3), (0, 4)]]) == 3
 
 
 def test_load():
