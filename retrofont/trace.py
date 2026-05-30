@@ -77,21 +77,24 @@ class Tracer:
             _p, _d = self._navigate(_p, _d)
 
     def load(self, glyph: bytes) -> None:
-        """
+        """Load a glyph.
+
+        :arg glyph: A glyph.
         """
         for p, pixel in traverse_glyph(glyph):
             self._load_pixel(p, pixel)
         self._paths = []
 
     def trace(self) -> None:
-        """
-        """
+        """Trace the loaded glyph."""
         for p in self._find_start():
             self._paths.append([])
             self._path_append(p)
             self._trace(p, (0, 1))
 
-    def get_paths(self) -> None:
-        """
+    def get_paths(self) -> list[list[tuple[int, int]]]:
+        """Get the result of the traced glyph.
+
+        :returns: Traced glyph paths.
         """
         return self._paths

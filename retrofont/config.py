@@ -4,7 +4,7 @@ from yaml import safe_load
 
 
 def _get_config_file() -> str:
-    config_sys = str(resources.files() / 'config.yaml')
+    config_sys = str(resources.files(__package__) / 'config.yaml')
     config_user = expanduser('~/.config/retrofont/config.yaml')
     return config_user if exists(config_user) else config_sys
 

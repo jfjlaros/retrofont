@@ -5,7 +5,7 @@ build-backend = 'hatchling.build'
 [project]
 name = 'RetroFont'
 description = 'TrueType retro fonts.'
-version = '0.0.5'
+version = '0.0.6'
 
 authors = [{name = 'Jeroen F.J. Laros', email = 'jlaros@fixedpoint.nl'}]
 urls = {homepage = 'https://github.com/jfjlaros/retrofont'}

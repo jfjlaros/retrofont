@@ -3,8 +3,9 @@ from typing import Iterator
 
 
 class Pixel(Enum):
-    empty = 0
-    filled = 1
+    """Pixel values."""
+    empty = 0    #: :meta hide-value:
+    filled = 1   #: :meta hide-value:
     visited = 2
 
 

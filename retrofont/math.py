@@ -3,7 +3,7 @@ from math import log, prod
 from operator import add
 
 
-def make_matrix(l: list, dim: tuple) -> list[...]:
+def make_matrix(l: list, dim: tuple[int, ...]) -> list[...]:
     """Make an n-dimensional matrix from a flat list.
 
     :arg l: List.
@@ -56,7 +56,7 @@ def pad_block(size: int, block_size: int) -> int:
     return ((size - 1 >> bits) + 1 << bits) - size
 
 
-def add_tuples(t1: tuple[int], t2: tuple[int]) -> tuple[int]:
+def add_tuples(t1: tuple[int, int], t2: tuple[int, int]) -> tuple[int, int]:
     """Add two 2-tuples.
 
     :arg t1: A 2-tuple.
@@ -69,7 +69,7 @@ def add_tuples(t1: tuple[int], t2: tuple[int]) -> tuple[int]:
     return (x1 + x2, y1 + y2)
 
 
-def rotate_tuple_cw(t: tuple[int]) -> tuple[int]:
+def rotate_tuple_cw(t: tuple[int, int]) -> tuple[int, int]:
     """Rotate a 2-tuple 90 degrees clockwise.
 
     :arg t: A 2-tuple.
@@ -80,7 +80,7 @@ def rotate_tuple_cw(t: tuple[int]) -> tuple[int]:
     return (y, -x)
 
 
-def rotate_tuple_ccw(t: tuple[int]) -> tuple[int]:
+def rotate_tuple_ccw(t: tuple[int, int]) -> tuple[int, int]:
     """Rotate a 2-tuple 90 degrees counterclockwise.
 
     :arg t: A 2-tuple.
