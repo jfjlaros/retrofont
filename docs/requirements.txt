@@ -1,3 +1,4 @@
-hatchling
 sphinx-argparse
+sphinx-autodoc-sphinx
 sphinx-autodoc-typehints
+typing-extensions

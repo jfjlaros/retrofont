@@ -1,21 +1,22 @@
 [build-system]
-requires = ['hatchling', 'pyyaml']
+requires = ['hatchling']
 build-backend = 'hatchling.build'
 
 [project]
-name = 'retrofont'
-dynamic = [
-  'authors', 'classifiers', 'description', 'keywords', 'license',
-  'license-files', 'version']
-readme = 'README.rst'
+name = 'RetroFont'
+description = 'TrueType retro fonts.'
+version = '0.0.5'
 
-dependencies = [
-  'fonttools',
-  'hatchling',
-  'pyyaml']
+authors = [{name = 'Jeroen F.J. Laros', email = 'jlaros@fixedpoint.nl'}]
+urls = {homepage = 'https://github.com/jfjlaros/retrofont'}
+readme = 'README.rst'
+keywords = ['retro', 'font', 'TrueType']
+classifiers = [
+    'Programming Language :: Python :: 3',
+    'Operating System :: OS Independent']
+license = 'MIT'
+
+dependencies = ['fonttools', 'pyyaml']
 
 [project.scripts]
 retrofont = 'retrofont:cli.main'
-
-[tool.hatch.metadata.hooks.custom]
-path = 'retrofont/meta.py'

@@ -4,13 +4,12 @@ from sys import stdout
 from typing import BinaryIO, TextIO
 from yaml import safe_dump, safe_load
 
-from . import doc_split
+from . import _copyright, _description, _info, doc_split
 from .font import (
     map_charset, map_font, keymap_to_permutation, rom_to_font,
     visualise_charset, yaml_to_font, font_to_yaml, font_to_rom)
 from .config import read_config, select_system_config
 from .ttf import TTF
-from .meta import _copyright, _description, _info
 
 
 def rom2ttf(
