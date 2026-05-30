@@ -7,4 +7,7 @@ author = _author
 copyright = _copyright
 
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx_autodoc_typehints', 'sphinxarg.ext']
+    'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints',
+    'sphinx_autodoc_argparse']
+html_theme = 'sphinx_rtd_theme'

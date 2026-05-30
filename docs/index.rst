@@ -7,5 +7,6 @@
    install
    usage
    gallery
+   cli
    api
    credits
