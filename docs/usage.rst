@@ -1,6 +1,8 @@
 Usage
 =====
 
+.. note:: This page is outdated.
+
 This program uses the Sharp MZ character and monitor ROMs_ for the display
 character sets and the interchange character set respectively.
 

@@ -40,20 +40,20 @@ Convert from ROM
 Download a character ROM_ (e.g., one from the MSX_) and run the following
 command.
 
-.. code:: bash
+.. code:: text
 
     retrofont rom2ttf -d ~/.local/share/fonts/ MSX charset_international.raw
     fc-cache -f
 
 Open a new terminal that uses the newly created font.
 
-.. code:: bash
+.. code:: text
 
     foot -f MSX
 
 .. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/normal.png
 
-The `-p` option will make the converted font the primary font. It will also
+The ``-p`` option will make the converted font the primary font. It will also
 make the characters square and it will remove line spacing.
 
 .. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/primary.png
@@ -62,10 +62,10 @@ make the characters square and it will remove line spacing.
 Testing
 ~~~~~~~
 
-The character sets can be shown using the `show` subcommand. The first (and
+The character sets can be shown using the ``show`` subcommand. The first (and
 usually only) character set is shown as follows.
 
-.. code:: bash
+.. code:: text
 
     retrofont show 0
 
@@ -96,7 +96,7 @@ Glyphs can be drawn by hand and put in a YAML file.
 This file can be converted into a character ROM file, which in turn can be
 used to create a TrueType font.
 
-.. code:: bash
+.. code:: text
 
     retrofont yml2rom demo.yaml demo.rom
     retrofont rom2ttf -d ~/.local/share/fonts/ demo demo.rom
@@ -109,11 +109,12 @@ Modifying fonts
 ~~~~~~~~~~~~~~~
 
 A character ROM file can be converted to a human readable YAML file using the
-`rom2yml` subcommand, in which te glyphs can be edited. The previously shown
-`yml2rom` can then be used to create the modified character ROM file.
+``rom2yml`` subcommand, in which te glyphs can be edited. The previously shown
+``yml2rom`` can then be used to create the modified character ROM file.
 
 
 Please see ReadTheDocs_ for the latest documentation.
+
 
 .. _ROM: https://github.com/ivop/8x8-fonts
 .. _MSX: https://github.com/ivop/8x8-fonts/raw/refs/heads/main/msx/charset_international.raw

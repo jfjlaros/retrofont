@@ -8,7 +8,7 @@ from . import _copyright, _description, _info, doc_split
 from .font import (
     map_charset, map_font, keymap_to_permutation, rom_to_font,
     visualise_charset, yaml_to_font, font_to_yaml, font_to_rom)
-from .config import read_config, select_system_config
+from .config import get_config_file, read_config, select_system_config
 from .ttf import TTF
 
 
@@ -58,7 +58,13 @@ def show_charset(handle: TextIO, charset: int) -> None:
     handle.write('\n'.join(visualise_charset(offset)) + '\n')
 
 
+def show_config(handle: TextIO) -> None:
+    """Show the configuration file location."""
+    handle.write(f'{get_config_file()}\n')
+
+
 def _arg_parser() -> object:
+    # TODO: Refactor.
     parser = ArgumentParser(
         description = _description, epilog=_copyright,
         formatter_class=RawDescriptionHelpFormatter)
@@ -117,6 +123,13 @@ def _arg_parser() -> object:
         '-o', dest='handle', type=FileType('wt'), default=stdout,
         help='output file')
     show_font_parser.set_defaults(func=show_charset)
+
+    show_config_parser = subparsers.add_parser(
+        'show_config', description=doc_split(show_config))
+    show_config_parser.add_argument(
+        '-o', dest='handle', type=FileType('wt'), default=stdout,
+        help='output file')
+    show_config_parser.set_defaults(func=show_config)
 
     return parser
 

@@ -3,7 +3,11 @@ from os.path import exists, expanduser
 from yaml import safe_load
 
 
-def _get_config_file() -> str:
+def get_config_file() -> str:
+    """Get the location of the configuration file in use.
+
+    :return: Location of the configuration file.
+    """
     config_sys = str(resources.files(__package__) / 'config.yaml')
     config_user = expanduser('~/.config/retrofont/config.yaml')
     return config_user if exists(config_user) else config_sys
@@ -14,7 +18,7 @@ def read_config() -> dict:
 
     :return: Configuration.
     """
-    config_file = _get_config_file()
+    config_file = get_config_file()
     with open(config_file, "rt") as config:
         return safe_load(config.read())
 

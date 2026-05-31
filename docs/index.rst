@@ -6,7 +6,11 @@
 
    install
    usage
-   gallery
    cli
+
+   config
+   library
    api
+
+   gallery
    credits
