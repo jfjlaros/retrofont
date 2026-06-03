@@ -51,12 +51,12 @@ Open a new terminal that uses the newly created font.
 
     foot -f MSX
 
-.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/normal.png
+.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_normal.png
 
 The ``-p`` option will make the converted font the primary font. It will also
 make the characters square and it will remove line spacing.
 
-.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/primary.png
+.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_primary.png
 
 
 Testing
@@ -69,7 +69,7 @@ usually only) character set is shown as follows.
 
     retrofont show 0
 
-.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/show.png
+.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_show.png
 
 Additional character sets are numbered 1, 2, etc. The primary character set
 has index -1.
@@ -98,11 +98,11 @@ used to create a TrueType font.
 
 .. code:: text
 
-    retrofont yml2rom demo.yaml demo.rom
-    retrofont rom2ttf -d ~/.local/share/fonts/ demo demo.rom
+    retrofont yml2rom test_font.yaml test_font.rom
+    retrofont rom2ttf -d ~/.local/share/fonts/ test_font test_font.rom
     fc-cache -f
 
-.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/demo.png
+.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/test_font.png
 
 
 Modifying fonts

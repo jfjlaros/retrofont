@@ -26,7 +26,7 @@ Open a new terminal that uses the Sharp MZ font.
 
     foot -f SharpMZ
 
-.. image:: images/normal_font.png
+.. image:: images/sharpmz_normal.png
 
 
 `default`
@@ -46,7 +46,7 @@ Open a new terminal that uses the Sharp MZ default font.
 
     foot -f SharpMZD
 
-.. image:: images/default_font.png
+.. image:: images/sharpmz_primary.png
 
 
 `test`

@@ -1,0 +1,11 @@
+This font uses the MSX character set as
+the primary font. The characters are
+square and the line distance is zero,
+just as on the original MSX machines.
+
+                
+               
+               
+                  
+                 
+

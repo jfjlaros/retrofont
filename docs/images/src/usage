@@ -1,0 +1,6 @@
+#!/bin/bash
+
+foot -f "SharpMZ:size=15" bash -c \
+  "clear; cat sharpmz_normal.txt; read" &
+foot -f "SharpMZ_P:size=12" bash -c \
+  "clear; cat sharpmz_primary.txt; read" &

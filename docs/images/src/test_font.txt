@@ -1,0 +1,2 @@
+$ echo -e 'One of the new characters is \ue100.'
+One of the new characters is .

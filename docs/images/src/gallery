@@ -1,0 +1,17 @@
+#!/bin/bash
+
+fonts="Atari_AC BBC_Amstrad C64_C64_LO\-1 CPC_army MSX_charset_international Oric_charset PC_ATIx550_8x8 ZX_IBM32"
+
+
+launch() {
+  font="${1}"
+
+  title=$(echo "${font}" | sed 's/\\//')
+  foot -f "${font}:size=11" bash -c \
+    "clear; echo Font ${title}.; echo; retrofont show 0; read" &
+}
+
+for font in ${fonts}; do
+  launch "${font}"
+  launch "${font}_P"
+done

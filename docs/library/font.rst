@@ -125,10 +125,6 @@ become unusable. This is why system specific configurations are available.
     system_config = select_system_config(config['systems'], 'C64')
     pp.pprint(system_config)
 
-A system configuration optionally contains the key ``primary``, under which
-the optional ``character_blocks`` and ``characters`` are found. A character
-block consists of two elements: a destination and a source range. A character
-only contains a destination and a source.
 
 .. code:: python
 
@@ -136,10 +132,8 @@ only contains a destination and a source.
       'primary': { 'character_blocks': [[32, [32, 96]], [96, [0, 32]]],
                    'characters': [[64, 0], [95, 100], [124, 93]]}}
 
-In this instance, characters from 32 to 96 are mapped to position 32 onward in
-the primary character set. Likewise characters from 0 to 32 are mapped to
-position 96 onward. Additionally, character 0 is mapped to position 64,
-character 100 to position 95 and character 93 to position 124.
+See the :ref:`config_system` section for more information about system
+configuration.
 
 These mappings are converted to a permutation using the
 ``keymap_to_permutation`` function.

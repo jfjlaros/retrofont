@@ -1,0 +1,13 @@
+This is a normal font with an additional MSX character set
+available in the UTF-8 private use area (U+E000):
+
+
+
+The additional characters are dimensioned in such a way that
+text drawings can be made without gaps or overlaps:
+
+                              
+                             
+                             
+                                
+                               
