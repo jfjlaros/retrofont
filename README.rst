@@ -58,6 +58,11 @@ make the characters square and it will remove line spacing.
 
 .. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_primary.png
 
+Adjusting the terminal foreground and background colours can have quite a
+convincing effect.
+
+.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/c64_boot.png
+
 
 Testing
 ~~~~~~~

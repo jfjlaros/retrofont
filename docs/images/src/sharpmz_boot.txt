@@ -1,0 +1,14 @@
+**  MONITOR 1Z-013A  **
+*L
+ PLAY
+LOADING  S-BASIC
+
+ 
+    BASIC INTERPRETER  1Z-013B V1.0A
+
+   COPYRIGHT (C) 1983 BY SHARP CORP.
+ 
+
+ 36439 BYTES FREE
+
+Ready
