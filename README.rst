@@ -22,14 +22,15 @@ RetroFont: TrueType font generator
 
 ----
 
+This package provides a programming library and a command line interface for
+conversion, creation and showing of TrueType retro fonts.
 
 .. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/invader.png
    :width: 150px
    :align: center
 
-This package provides a programming library and a command line interface for
-conversion, creation and showing of TrueType retro fonts.
 
+.. _quickstart:
 
 Quick start
 -----------
@@ -45,39 +46,36 @@ command.
     retrofont rom2ttf -d ~/.local/share/fonts/ MSX charset_international.raw
     fc-cache -f
 
-Open a new terminal that uses the newly created font.
+Open a new terminal that uses the newly created font. In Wayland we can use
+``foot`` as follows.
 
 .. code:: text
 
     foot -f MSX
 
-.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_normal.png
+In X, ``xterm`` can be used.
+
+.. code:: text
+
+    xterm -fa MSX
+
+.. figure:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_normal.png
+
+    MSX character set in the UTF-8 Private Use Area U+E000.
 
 The ``-p`` option will make the converted font the primary font. It will also
 make the characters square and it will remove line spacing.
 
-.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_primary.png
+.. figure:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_primary.png
+
+    MSX character set in the primary font.
 
 Adjusting the terminal foreground and background colours can have quite a
 convincing effect.
 
-.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/c64_boot.png
+.. figure:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/c64_boot.png
 
-
-Testing
-~~~~~~~
-
-The character sets can be shown using the ``show`` subcommand. The first (and
-usually only) character set is shown as follows.
-
-.. code:: text
-
-    retrofont show 0
-
-.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_show.png
-
-Additional character sets are numbered 1, 2, etc. The primary character set
-has index -1.
+    Commodore 64 character set in the primary font.
 
 
 Creation
@@ -87,6 +85,7 @@ Glyphs can be drawn by hand and put in a YAML file.
 
 .. code:: yaml
 
+    - # ...
     - - data:
         - ' #    # '
         - '  #  #  '
@@ -97,6 +96,7 @@ Glyphs can be drawn by hand and put in a YAML file.
         - '#      #'
         - '###  ###'
         offset: 1
+      # ...
 
 This file can be converted into a character ROM file, which in turn can be
 used to create a TrueType font.
@@ -107,15 +107,9 @@ used to create a TrueType font.
     retrofont rom2ttf -d ~/.local/share/fonts/ test_font test_font.rom
     fc-cache -f
 
-.. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/test_font.png
+.. figure:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/test_font.png
 
-
-Modifying fonts
-~~~~~~~~~~~~~~~
-
-A character ROM file can be converted to a human readable YAML file using the
-``rom2yml`` subcommand, in which te glyphs can be edited. The previously shown
-``yml2rom`` can then be used to create the modified character ROM file.
+    Newly created glyph in the UTF-8 Private Use Area.
 
 
 Please see ReadTheDocs_ for the latest documentation.

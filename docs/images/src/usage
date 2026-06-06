@@ -1,6 +1,15 @@
 #!/bin/bash
 
-foot -f "SharpMZ:size=15" bash -c \
-  "clear; cat sharpmz_normal.txt; read" &
-foot -f "SharpMZ_P:size=12" bash -c \
-  "clear; cat sharpmz_primary.txt; read" &
+msg='cowsay this is just a terminal'
+foot -c c64_foot.ini -f 'C64_C64_UP\-1_P:size=12' bash -c \
+  "clear; cat c64_boot.txt; echo ${msg}; ${msg}; read" &
+foot -f SharpMZ:size=15 bash -c \
+  'clear; cat sharpmz_normal.txt; read' &
+foot -f SharpMZ_P:size=12 bash -c \
+  'clear; cat sharpmz_primary.txt; read' &
+foot -c sharpmz_foot.ini -f SharpMZ_P:size=12 bash -c \
+  'clear; cat sharpmz_boot.txt; read' &
+foot -f SharpMZ:size=11 bash -c \
+  'clear; retrofont show 3; read' &
+foot -f SharpMZ_P:size=11 bash -c \
+  'clear; retrofont show -1; read' &
