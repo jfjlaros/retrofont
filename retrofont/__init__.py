@@ -3,7 +3,7 @@ from re import split
 from typing import Callable
 
 
-def _extract(key: str, delim: str=r'[^\s\S]', index: int=0) -> str:
+def _extract(key: str, delim: str = r'[^\s\S]', index: int = 0) -> str:
     try:
         value = metadata(__package__).get(key, '')
     except PackageNotFoundError:

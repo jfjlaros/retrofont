@@ -26,8 +26,9 @@ class TTF:
     def _config(self) -> None:
         self._glyph_width = self._glyphs.get('space').width
         self._glyph_offset = self._font['OS/2'].sTypoDescender
-        self._glyph_height = (self._font['OS/2'].sTypoAscender
-            + self._font['OS/2'].sTypoLineGap - self._glyph_offset)
+        self._glyph_height = (
+            self._font['OS/2'].sTypoAscender +
+            self._font['OS/2'].sTypoLineGap - self._glyph_offset)
 
     def _set_name(self, font_name: str) -> None:
         self._font['name'].setName(font_name, 1, 3, 1, 0x409)

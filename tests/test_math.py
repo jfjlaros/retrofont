@@ -4,22 +4,22 @@ from retrofont.math import (
 
 
 def test_make_matrix():
-    l = [1, 2, 3, 4]
+    lst = [1, 2, 3, 4]
 
-    assert make_matrix(l, ()) == [1, 2, 3, 4]
-    assert make_matrix(l, (1,)) == [[1], [2], [3], [4]]
-    assert make_matrix(l, (2,)) == [[1, 2], [3, 4]]
-    assert make_matrix(l, (2, 1)) == [[[1], [2]], [[3], [4]]]
+    assert make_matrix(lst, ()) == [1, 2, 3, 4]
+    assert make_matrix(lst, (1,)) == [[1], [2], [3], [4]]
+    assert make_matrix(lst, (2,)) == [[1, 2], [3, 4]]
+    assert make_matrix(lst, (2, 1)) == [[[1], [2]], [[3], [4]]]
 
 
 def test_flatten_matrix():
-    l = [1, 2, 3, 4]
+    lst = [1, 2, 3, 4]
 
-    assert flatten_matrix([1, 2, 3, 4]) == l
-    assert flatten_matrix([[1], [2], [3], [4]]) == l
-    assert flatten_matrix([[1, 2], [3, 4]]) == l
-    assert flatten_matrix([[[1], [2]], [[3], [4]]]) == l
-    assert flatten_matrix([[[1], [2]], [[3], [4]], []]) == l
+    assert flatten_matrix([1, 2, 3, 4]) == lst
+    assert flatten_matrix([[1], [2], [3], [4]]) == lst
+    assert flatten_matrix([[1, 2], [3, 4]]) == lst
+    assert flatten_matrix([[[1], [2]], [[3], [4]]]) == lst
+    assert flatten_matrix([[[1], [2]], [[3], [4]], []]) == lst
 
 
 def test_reverse_byte():

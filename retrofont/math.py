@@ -3,31 +3,32 @@ from math import log, prod
 from operator import add
 
 
-def make_matrix(l: list, dim: tuple[int, ...]) -> list[...]:
+def make_matrix(lst: list, dim: tuple[int, ...]) -> list[...]:
     """Make an n-dimensional matrix from a flat list.
 
-    :arg l: List.
+    :arg lst: List.
     :arg dim: Dimensions of the matrix.
 
     :return: Matrix.
     """
     if not dim:
-        return l
+        return lst
     size = prod(dim)
     sdim = dim[1:]
-    return [make_matrix(l[i:i + size], sdim) for i in range(0, len(l), size)]
+    return [
+        make_matrix(lst[i:i + size], sdim) for i in range(0, len(lst), size)]
 
 
-def flatten_matrix(m: list[...]) -> list:
+def flatten_matrix(mtx: list[...]) -> list:
     """Make a flat list from an n-dimensional matrix.
 
-    :arg m: Matrix.
+    :arg mtx: Matrix.
 
     :return: List.
     """
-    if not isinstance(m, list):
-        return [m]
-    return list(reduce(add, [flatten_matrix(s) for s in m], []))
+    if not isinstance(mtx, list):
+        return [mtx]
+    return list(reduce(add, [flatten_matrix(s) for s in mtx], []))
 
 
 def reverse_byte(byte: int) -> int:

@@ -2,7 +2,7 @@ from .glyph import decode_glyph, encode_glyph
 from .math import flatten_matrix, make_matrix, pad_block, reverse_byte
 
 
-def rom_to_font(data: bytes, mirror: bool=False) -> list[list[bytes]]:
+def rom_to_font(data: bytes, mirror: bool = False) -> list[list[bytes]]:
     """Deserialise ROM content to a font.
 
     :arg data: Character ROM content.

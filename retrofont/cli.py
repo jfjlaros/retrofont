@@ -13,8 +13,8 @@ from .ttf import TTF
 
 
 def rom2ttf(
-        name: str, cgrom: BinaryIO, fwrom: BinaryIO=None, sys_type: str='',
-        dest: str='.', primary: bool=False) -> None:
+        name: str, cgrom: BinaryIO, fwrom: BinaryIO = None,
+        sys_type: str = '', dest: str = '.', primary: bool = False) -> None:
     """Create a TrueType font."""
     config = read_config()
     system = select_system_config(config['systems'], sys_type)
@@ -66,7 +66,7 @@ def show_config(handle: TextIO) -> None:
 def _arg_parser() -> object:
     # TODO: Refactor.
     parser = ArgumentParser(
-        description = _description, epilog=_copyright,
+        description=_description, epilog=_copyright,
         formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument(
         '-v', action='version', version=_info)
