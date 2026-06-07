@@ -83,7 +83,7 @@ font.
 
 .. figure:: images/c64_font_P.png
 
-    Commodore 64 font as primary font.
+    Primary font using the Commodore 64 character set.
 
 In this instance, characters from 0x20 to 0x5f are mapped to position 0x20
 onward in the primary character set. Likewise characters from 0x00 to 0x1f are
@@ -95,4 +95,8 @@ to position 0x40, character 0x64 (``_``) to position 0x5f and character 0x5d
 Contributing
 ------------
 
-Additions are welcome [link to contributing].
+New system configurations and additions to existing system configurations are
+welcome_.
+
+
+.. _welcome: https://github.com/jfjlaros/retrofont/blob/master/.github/CONTRIBUTING.md

@@ -1,48 +1,51 @@
 Usage
 =====
 
-This package provides a command line interface for conversion, creation and showing TrueType retro fonts. It does so by converting binary encoded glyphs form character ROM images or by converting to and from a human readable format.
+This package provides a command line interface for conversion, creation and
+manipulation of TrueType retro fonts. It does so by converting binary encoded
+glyphs from character ROM images or by converting to and from a human readable
+format.
 
 .. figure:: images/c64_cowsay.png
 
-    Plain Bash running in a terminal.
+    Just a terminal.
 
 
 ``rom2ttf``
 -----------
 
-The ``rom2ttf`` subcommand creates a font that contains character sets in the
-UTF-8 Private Use Area. The main use case for this subcommand is covered in
-the the :ref:`quickstart` section. Here, we will focus on more complicated
-cases. The Sharp MZ-700 provides us with such a case, this system has two
-character sets, characters are stored in a different order from which they are
-used (the firmware uses a mapping table) and all glyphs are mirrored.
+The ``rom2ttf`` subcommand creates character sets in the UTF-8 Private Use
+Area. The main use case for this subcommand is covered in the the
+:ref:`quickstart` section, so here we will focus on more complicated cases.
+The Sharp MZ-700 provides us with such a case, this system has two character
+sets, characters are stored in a different order from which they are used (the
+firmware uses a mapping table) and all glyphs are mirrored.
 
-Both the character ROM as well as the firmware can be found in the
-`internet archive`_.
+Both the character ROM as well as the firmware can be found in the `internet
+archive`_. The following command creates a TrueType font that contains the
+Sharp MZ character sets.
 
 .. code:: bash
 
     retrofont rom2ttf -d ~/.local/share/fonts -f 1z-013a.rom -s SharpMZ SharpMZ mz700fon.int
     fc-cache -f
 
-In this example, we provide a system name via the ``-s`` option, which is
-used to retrieve system specific configuration values. For the Sharp MZ
-series, the ``mirror`` configuration value, which controls the mirroring of
-glyphs, is set to ``true`` and the ``map_offset`` configuration value is set
-to ``0x0a92``. The latter value is used in conjunction with the ``-f`` flag,
-which provides a path to the firmware ROM image. A mapping table of 256 bytes
-is read from the ROM impage from offset 0x0a92 onward. This mapping table is
+In this example, we provide a system name with the ``-s`` option, which is
+used to retrieve system specific configuration values. See the
+:ref:`config_system` section for more information. For the Sharp MZ series,
+the ``mirror`` configuration value, which controls glyph mirroring, is
+set to ``true`` and the ``map_offset`` configuration value is set to
+``0x0a92``. The latter value is used in conjunction with the ``-f`` flag,
+which provides a path to a firmware ROM image. A mapping table of 256 bytes
+is read from this ROM image from offset 0x0a92 onward. This mapping table is
 used to permute the character sets.
 
-This command converts the character ROM image file ``mz700fon.int`` to a
-TrueType font file named ``SharpMZ.ttf`` and placed in
-``~/.local/share/fonts`` as provided via the ``-d`` option. The font name is
-set to ``SharpMZ``, the last but one parameter controls both the file name as
-the font name.
+The character ROM image ``mz700fon.int`` is converted to a TrueType font file
+named ``SharpMZ.ttf``, which is placed in ``~/.local/share/fonts`` as provided
+with the ``-d`` option. The font name is set to ``SharpMZ``, the last but one
+parameter controls both the file name as well as the font name.
 
-The font can be used in a terminal as follows. In Wayland we can use ``foot``
-as follows.
+The font can be used in a Wayland ``foot`` terminal as follows.
 
 .. code:: text
 
@@ -55,11 +58,11 @@ In X, ``xterm`` can be used.
     xterm -fa SharpMZ
 
 The character sets are placed in the UTF-8 Private Use Area U+E000. This
-allows for mixing bothe the original font as well as the additional fonts. 
+allows for mixing the additional fonts with the original font.
 
 .. figure:: images/sharpmz_normal.png
 
-    Plain text mixed with SHarp MZ characters.
+    Plain text mixed with Sharp MZ characters.
 
 
 The ``-p`` flag additionally changes the primary font, uses square characters
@@ -80,14 +83,14 @@ follows.
 
 .. figure:: images/sharpmz_primary.png
 
-    Sharp MZ character set in the primary font.
+    Primary font using the Sharp MZ character set.
 
 Adjusting the terminal foreground and background colours can have quite a
 convincing effect.
 
 .. figure:: images/sharpmz_boot.png
 
-    This is not a screenshot of an emulator.
+    Not a screenshot of an MZ-700 emulator.
 
 
 ``show``
@@ -120,20 +123,20 @@ as follows.
 
 .. figure:: images/sharpmz_show_P.png
 
-    lorem ipsum
+    Primary character set.
 
 
 ``rom2yml``
 -----------
 
 A character ROM file can be converted to a human readable YAML file using the
-``rom2yml`` subcommand, in which te glyphs can be edited.
+``rom2yml`` subcommand.
 
 .. code:: text
 
     retrofont rom2yml mz700fon.int mz700fon.yml
 
-The newly created YAML file starts as follows.
+The newly created YAML file looks as follows.
 
 .. code:: yaml
 
@@ -159,7 +162,7 @@ The newly created YAML file starts as follows.
         offset: 2
       # ...
 
-Notice that the glyphs are mirrored, this is one of the reasons we need a
+Note that the glyphs are mirrored, this is one of the reasons we need a
 ``SharpMZ`` configuration section.
 
 

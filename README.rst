@@ -23,7 +23,7 @@ RetroFont: TrueType font generator
 ----
 
 This package provides a programming library and a command line interface for
-conversion, creation and showing of TrueType retro fonts.
+conversion, creation and manipulation of TrueType retro fonts.
 
 .. image:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/invader.png
    :width: 150px
@@ -53,7 +53,7 @@ Open a new terminal that uses the newly created font. In Wayland we can use
 
     foot -f MSX
 
-In X, ``xterm`` can be used.
+In X, we can use ``xterm``.
 
 .. code:: text
 
@@ -61,21 +61,21 @@ In X, ``xterm`` can be used.
 
 .. figure:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_normal.png
 
-    MSX character set in the UTF-8 Private Use Area U+E000.
+    Plain text mixed with MSX characters.
 
-The ``-p`` option will make the converted font the primary font. It will also
-make the characters square and it will remove line spacing.
+The ``-p`` option additionally uses the converted font as the primary font. It
+will also make the characters square and it will remove line spacing.
 
 .. figure:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/msx_primary.png
 
-    MSX character set in the primary font.
+    Primary font using the MSX character set.
 
 Adjusting the terminal foreground and background colours can have quite a
 convincing effect.
 
 .. figure:: https://raw.githubusercontent.com/jfjlaros/retrofont/master/docs/images/c64_boot.png
 
-    Commodore 64 character set in the primary font.
+    Not a screenshot of a Commodore 64 emulator.
 
 
 Creation
@@ -95,7 +95,7 @@ Glyphs can be drawn by hand and put in a YAML file.
         - ' ###### '
         - '#      #'
         - '###  ###'
-        offset: 1
+        offset: 0
       # ...
 
 This file can be converted into a character ROM file, which in turn can be

@@ -89,7 +89,7 @@ Text fonts can be converted to a normal (binary) font using the
     print('Size of the first character set:', len(font[0]))
 
 The first character set of this font contains 256 glyphs instead of the two we
-found in the text tont. Any undefined glyphs have been converted to the empty
+found in the text font. Any undefined glyphs have been converted to the empty
 glyph.
 
 .. code:: text
