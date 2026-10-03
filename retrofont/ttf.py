@@ -24,7 +24,7 @@ class TTF:
         self._tracer = Tracer()
 
     def _config(self) -> None:
-        self._glyph_width = self._glyphs.get('space').width
+        self._glyph_width = self._font['head'].unitsPerEm
         self._glyph_offset = self._font['OS/2'].sTypoDescender
         self._glyph_height = (
             self._font['OS/2'].sTypoAscender +
@@ -54,7 +54,7 @@ class TTF:
         glyph_name = f'uni{code:04x}'
         self._font['glyf'][glyph_name] = pen.glyph()
 
-        lsb = get_lsb(paths) * self._glyph_width // 8
+        lsb = get_lsb(paths) * (self._glyph_width // 8)
         self._font['hmtx'][glyph_name] = (self._glyph_width, lsb)
 
         for table in self._cmap_tables:
@@ -72,7 +72,7 @@ class TTF:
         self._glyph_offset = 0
 
         self._font['OS/2'].sTypoAscender = self._glyph_height
-        self._font['OS/2'].sTypoDecender = 0
+        self._font['OS/2'].sTypoDescender = 0
         self._font['OS/2'].sTypoLineGap = 0
 
         self._font['OS/2'].usWinAscent = self._glyph_height
@@ -80,7 +80,7 @@ class TTF:
 
         self._font['hhea'].ascent = self._glyph_height
         self._font['hhea'].descent = 0
-        self._font['hhea'].linegap = 0
+        self._font['hhea'].lineGap = 0
 
     def set_primary(self, charset: list[bytes]) -> None:
         """Set the primary character set.

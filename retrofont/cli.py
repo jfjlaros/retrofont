@@ -64,7 +64,11 @@ def show_config(handle: TextIO) -> None:
 
 
 def _arg_parser() -> object:
-    # TODO: Refactor.
+    output_parser = ArgumentParser(add_help=False)
+    output_parser.add_argument(
+        '-o', dest='handle', type=FileType('wt'), default=stdout,
+        help='output file')
+
     parser = ArgumentParser(
         description=_description, epilog=_copyright,
         formatter_class=RawDescriptionHelpFormatter)
@@ -115,20 +119,16 @@ def _arg_parser() -> object:
     rom2yml_parser.set_defaults(func=rom2yml)
 
     show_font_parser = subparsers.add_parser(
-        'show', description=doc_split(show_charset))
+        'show', parents=[output_parser],
+        description=doc_split(show_charset))
     show_font_parser.add_argument(
         'charset', metavar='CHARSET', type=int,
         help='character set')
-    show_font_parser.add_argument(
-        '-o', dest='handle', type=FileType('wt'), default=stdout,
-        help='output file')
     show_font_parser.set_defaults(func=show_charset)
 
     show_config_parser = subparsers.add_parser(
-        'show_config', description=doc_split(show_config))
-    show_config_parser.add_argument(
-        '-o', dest='handle', type=FileType('wt'), default=stdout,
-        help='output file')
+        'show_config', parents=[output_parser],
+        description=doc_split(show_config))
     show_config_parser.set_defaults(func=show_config)
 
     return parser

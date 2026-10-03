@@ -1,6 +1,8 @@
 from .glyph import decode_glyph, encode_glyph
 from .math import flatten_matrix, make_matrix, pad_block, reverse_byte
 
+_blank = b'\x00' * 8
+
 
 def rom_to_font(data: bytes, mirror: bool = False) -> list[list[bytes]]:
     """Deserialise ROM content to a font.
@@ -18,7 +20,7 @@ def rom_to_font(data: bytes, mirror: bool = False) -> list[list[bytes]]:
 
 
 def font_to_rom(font: list[list[bytes]]) -> bytes:
-    """Serialise a front to ROM content.
+    """Serialise a font to ROM content.
 
     :arg font: Font.
 
@@ -36,7 +38,7 @@ def yaml_to_font(yaml_font: list[dict]) -> list[list[bytes]]:
     """
     font = []
     for yaml_charset in yaml_font:
-        charset = [b'\x00' * 8 for _ in range(256)]
+        charset = [_blank for _ in range(256)]
         for yaml_glyph in yaml_charset:
             charset[yaml_glyph['offset']] = encode_glyph(yaml_glyph['data'])
         font.append(charset)
@@ -54,7 +56,7 @@ def font_to_yaml(font: list[list[bytes]]) -> list[dict]:
     for charset in font:
         yaml_charset = []
         for i, glyph in enumerate(charset):
-            if glyph != b'\x00\x00\x00\x00\x00\x00\x00\x00':
+            if glyph != _blank:
                 yaml_charset.append(
                     {'offset': i, 'data': decode_glyph(glyph)})
         yaml_font.append(yaml_charset)

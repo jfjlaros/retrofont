@@ -23,39 +23,41 @@ class Tracer:
         self._glyph = [[Pixel.empty] * 18 for _ in range(18)]
         self._paths = []
 
-    def _get(self, p: tuple[int]) -> object:
+    def _get(self, p: tuple[int, int]) -> Pixel:
         r, c = p
         return self._glyph[r][c]
 
-    def _load_pixel(self, p: tuple[int], pixel) -> None:
+    def _load_pixel(self, p: tuple[int, int], pixel: Pixel) -> None:
         r, c = p
         for dr, dc in [(0, 0), (1, 0), (0, 1), (1, 1)]:
             self._glyph[2 * r + dr + 1][2 * c + dc + 1] = pixel
 
-    def _is_start(self, p: tuple[int]) -> bool:
+    def _is_start(self, p: tuple[int, int]) -> bool:
         return (
             self._get(p) == Pixel.filled and
             self._get(add_tuples(p, (-1, 0))) == Pixel.empty)
 
-    def _find_start(self) -> Iterator[tuple[int]]:
+    def _find_start(self) -> Iterator[tuple[int, int]]:
         for r in range(1, 17):
             for c in range(1, 17):
                 if self._is_start((r, c)):
                     yield (r, c)
 
-    def _visit(self, p: tuple[int], d: tuple[int]) -> None:
+    def _visit(self, p: tuple[int, int]) -> None:
         r, c = p
         self._glyph[r][c] = Pixel.visited
 
-    def _step(self, p: tuple[int], d: tuple[int]) -> tuple[int]:
-        self._visit(p, d)
+    def _step(self, p: tuple[int, int], d: tuple[int, int]
+            ) -> tuple[int, int]:
+        self._visit(p)
         return add_tuples(p, d)
 
-    def _path_append(self, p: tuple[int]) -> None:
+    def _path_append(self, p: tuple[int, int]) -> None:
         r, c = p
         self._paths[-1].append((r // 2, c // 2))
 
-    def _navigate(self, p: tuple[int], d: tuple[int]) -> tuple[tuple[int]]:
+    def _navigate(self, p: tuple[int, int], d: tuple[int, int]
+            ) -> tuple[tuple[int, int], tuple[int, int]]:
         if self._get(add_tuples(p, d)) == Pixel.empty:
             self._path_append(p)
             return (p, rotate_tuple_cw(d))
@@ -65,12 +67,12 @@ class Tracer:
             return (self._step(p, _d), _d)
         return (self._step(p, d), d)
 
-    def _prepend_inner(self, p: tuple[int]) -> None:
+    def _prepend_inner(self, p: tuple[int, int]) -> None:
         _p = add_tuples(p, (0, -1))
         if self._get(_p) == Pixel.filled:
-            self._visit(add_tuples(p, (0, -1)), (0, 1))
+            self._visit(add_tuples(p, (0, -1)))
 
-    def _trace(self, p: tuple[int], d: tuple[int]) -> None:
+    def _trace(self, p: tuple[int, int], d: tuple[int, int]) -> None:
         _p, _d = p, d
         self._prepend_inner(p)
         while self._get(_p) == Pixel.filled:
