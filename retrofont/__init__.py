@@ -15,12 +15,16 @@ def doc_split(func: Callable) -> str:
     return func.__doc__.split('\n\n')[0]
 
 
-_project = _extract('Name')
-_version = _extract('Version')
-_year = '2026'
-_author = _extract('Author-email', r'"', 1)
 _email = _extract('Author-email', r'<|>', 1)
-_description = _extract('Summary')
-_copyright = f'Copyright (c) {_year} by {_author} <{_email}>'
 _url = _extract('Project-URL', r', ', 1)
-_info = f'{_project} version {_version}\n\n{_copyright}\nHomepage: {_url}'
+_year = '2026'
+
+project = _extract('Name')
+release = _extract('Version')
+author = _extract('Author-email', r'"', 1)
+description = _extract('Summary')
+copyright = f'{_year} by {author} <{_email}>'
+info = f'''{project} version {release}
+
+Copyright (C) {copyright}
+Homepage: {_url}'''

@@ -1,5 +1,5 @@
 [build-system]
-requires = ['hatchling']
+requires = ['hatchling>=1.32']
 build-backend = 'hatchling.build'
 
 [project]
@@ -16,7 +16,24 @@ classifiers = [
     'Operating System :: OS Independent']
 license = 'MIT'
 
-dependencies = ['fonttools', 'pyyaml']
+requires-python = '>=3.10'
+dependencies = [
+  'fonttools>=4.63.0',
+  'PyYAML>=6.0.3']
 
 [project.scripts]
 retrofont = 'retrofont.cli:main'
+
+[project.optional-dependencies]
+dev = [
+    'build>=1.6.1',
+    'flake8>=7.4.1',
+    'pytest-cov>=2.10.0',
+    'pytest>=4.0.1',
+    'twine>=7.0.0']
+docs = [
+    'sphinx-autodoc-argparse>=0.0.1a26',
+    'sphinx-autodoc-sphinx>=0.0.1a26',
+    'sphinx-autodoc-typehints>=3.10.3',
+    'sphinx_rtd_theme>=3.1.0',
+    'typing_extensions>=4.15.0']

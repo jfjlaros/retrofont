@@ -4,7 +4,7 @@ from sys import stdout
 from typing import BinaryIO, TextIO
 from yaml import safe_dump, safe_load
 
-from . import _copyright, _description, _info, doc_split
+from . import description, doc_split, info
 from .font import (
     map_charset, map_font, keymap_to_permutation, rom_to_font,
     visualise_charset, yaml_to_font, font_to_yaml, font_to_rom)
@@ -70,10 +70,10 @@ def _arg_parser() -> object:
         help='output file')
 
     parser = ArgumentParser(
-        description=_description, epilog=_copyright,
+        description=description, epilog=info,
         formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument(
-        '-v', action='version', version=_info)
+        '-v', action='version', version=info)
     subparsers = parser.add_subparsers(dest='subcommand')
     subparsers.required = True
 

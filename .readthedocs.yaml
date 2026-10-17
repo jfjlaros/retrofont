@@ -1,14 +1,15 @@
 version: 2
 
 build:
-  os: ubuntu-20.04
+  os: ubuntu-lts-latest
   tools:
-    python: "3.13"
-
-sphinx:
-  configuration: docs/conf.py
+    python: latest
 
 python:
   install:
     - path: .
-    - requirements: docs/requirements.txt
+      extra_requirements:
+        - docs
+
+sphinx:
+  configuration: docs/conf.py

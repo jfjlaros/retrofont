@@ -1,13 +1,8 @@
-from retrofont import _author, _copyright, _project, _version
+from retrofont import author, copyright, project, release
 
-
-project = _project
-release = _version
-author = _author
-copyright = _copyright
 
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx_autodoc_typehints',
-    'sphinx_autodoc_argparse']
+    'sphinx_autodoc_argparse',
+    'sphinx_autodoc_typehints']
 html_theme = 'sphinx_rtd_theme'
